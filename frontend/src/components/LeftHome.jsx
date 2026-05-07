@@ -28,9 +28,9 @@ function LeftHome() {
       </div>
       <div className="w-full flex  justify-between items-center px-2.5 border-b-2 border-gray-900 pb-2.5">
         <div className="flex justify-center items-center gap-2.5">
-          <div className="w-17 h-17 border-black border-2 rounded-full cursor-pointer overflow-hidden">
+          <div className="w-15 h-15 border-black border-2 rounded-full  overflow-hidden">
             <img
-              className="w-full object-cover"
+              className="w-full object-cover aspect-square"
               src={userData.avatar || dp}
               alt=""
             />

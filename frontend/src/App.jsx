@@ -1,27 +1,50 @@
-import React from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
-import Signup from './pages/Signup'
-import Login from './pages/Login'
-import ForgotPassword from './pages/ForgotPassword'
-import Home from './pages/Home'
-import { useSelector } from 'react-redux'
-import getCurrentUser from './hooks/getCurrentUser'
-import getSuggestedUsers from './hooks/getSuggestedUsers'
-
+import React from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import Home from "./pages/Home";
+import { useSelector } from "react-redux";
+import getCurrentUser from "./hooks/getCurrentUser";
+import getSuggestedUsers from "./hooks/getSuggestedUsers";
+import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
+import { Toaster } from "react-hot-toast";
 function App() {
   getCurrentUser();
   getSuggestedUsers();
-  const {userData} = useSelector(state=>state.user)
+  const { userData } = useSelector((state) => state.user);
   return (
     <div>
+      <Toaster position="top-center" reverseOrder={false} />
       <Routes>
-        <Route path='/' element={userData?<Home/>:<Navigate to={"/login"}/>}/>
-        <Route path='/signup' element={!userData?<Signup/>:<Navigate to={"/"}/>}/>
-        <Route path='/login' element={!userData?<Login/>:<Navigate to={"/"}/>}/>
-        <Route path='/forgot-password' element={!userData?<ForgotPassword/>:<Navigate to={"/"}/>}/>
+        <Route
+          path="/"
+          element={userData ? <Home /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/signup"
+          element={!userData ? <Signup /> : <Navigate to={"/"} />}
+        />
+        <Route
+          path="/login"
+          element={!userData ? <Login /> : <Navigate to={"/"} />}
+        />
+        <Route
+          path="/forgot-password"
+          element={!userData ? <ForgotPassword /> : <Navigate to={"/"} />}
+        />
+        <Route
+          path="/profile/:username"
+          element={userData ? <Profile /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/edit-profile"
+          element={userData ? <EditProfile /> : <Navigate to={"/login"} />}
+        />
       </Routes>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -5,6 +5,8 @@ const userSchema = new Schema(
     name: {
       type: String,
       required: true,
+      maxlength: [20, "Username cannot exceed 20 characters"],
+      minlength: [3, "Name must be at least 3 characters"]
     },
     username: {
       type: String,
@@ -12,6 +14,8 @@ const userSchema = new Schema(
       trim: true,
       lowercase: true,
       unique: true,
+      maxlength: [20, "Username cannot exceed 20 characters"],
+      minlength: [3, "Username must be at least 3 characters"]
     },
     email: {
       type: String,
@@ -26,6 +30,19 @@ const userSchema = new Schema(
     },
     avatar: {
       type: String,
+    },
+    bio: {
+      type: String,
+      maxlength: [50, "Bio cannot exceed 50 characters"],
+    },
+    profession: {
+      type: String,
+    },
+    gender: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      enum:["male","female","other"]
     },
     followers: [
         { type: mongoose.Schema.Types.ObjectId,
