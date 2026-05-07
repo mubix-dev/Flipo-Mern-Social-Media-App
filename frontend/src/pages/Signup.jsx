@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import logo from "../assets/logo3.png";
+import logo from "../assets/logo.png";
 import icon from "../assets/icon.png";
 import { IoIosEye } from "react-icons/io";
 import { IoIosEyeOff } from "react-icons/io";
@@ -7,6 +7,8 @@ import axios from "axios"
 import { serverURL } from "../main";
 import { BeatLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice";
 function Signup() {
   const [inputClicked, setInputClicked] = useState({
     name: false,
@@ -23,6 +25,7 @@ function Signup() {
   const [password, setPassword] = useState("");
   let [error, setError] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
 
   const handleSignup = async () => {
@@ -34,8 +37,12 @@ function Signup() {
         { name, username, email, password },
         { withCredentials: true }
       );
-      console.log(result);
+      dispatch(setUserData(result.data))
       setLoading(false)
+      setName("");
+      setUsername("")
+      setEmail("")
+      setPassword("")
     } catch (err) {
       const msg = err.response?.data?.message || "Something went wrong";
       setError(msg);

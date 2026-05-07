@@ -11,6 +11,12 @@ const signup = async (req, res) => {
       return res.status(404).json({ message: "Incomplete Information" });
     }
 
+    if(username.length > 16){
+      return res.status(404).json({ message: "Username should be less than 16 characters" });
+    }
+    if(name.length > 20){
+      return res.status(404).json({ message: "Name should be less than 20 characters" });
+    }
     const existedUser = await User.findOne({
       $or: [{ username }, { email }],
     });
