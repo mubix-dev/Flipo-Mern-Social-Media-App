@@ -20,14 +20,9 @@ function Feed() {
         <StoryDp name={"jhjhj"}/>
         <StoryDp name={"jhjhj"}/>
         <StoryDp name={"jhjhj"}/>
-        <StoryDp name={"jhjhj"}/>
-        <StoryDp name={"jhjhjjj"}/>
-        <StoryDp name={"jhjhj"}/>
-        <StoryDp name={"jhjhj"}/>
-        <StoryDp name={"jhjhj"}/>
       </div>
 
-      <div className='w-full min-h-screen flex flex-col items-center gap-5 p-5 pt-10 bg-gray-900 rounded-t-[50px]  relative overflow-auto '>
+      <div className='w-full min-h-screen flex flex-col items-center gap-5 p-5 pt-10 bg-white rounded-t-[50px]  relative overflow-auto '>
         <Nav/>
       </div>
     </div>
