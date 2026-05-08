@@ -1,34 +1,40 @@
 import mongoose, { Schema } from "mongoose";
 
-
-const flipSchema = new Schema({
-    author:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        required:true
+const flipSchema = new Schema(
+  {
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    media:{
-        type:String,
-        required:true
+    media: {
+      type: String,
+      required: true,
     },
-    caption:{
-        type:String,
+    caption: {
+      type: String,
     },
-    likes:[
-        {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"User"
-        }
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
     ],
-    comments:[
-        {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"User"
-        }
-    ]
-},{timestamps:true})
+    comments: [
+      {
+        author: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        message: {
+          type: String,
+        },
+      },
+    ],
+  },
+  { timestamps: true },
+);
 
-
-const Flip = mongoose.model("Flip",flipSchema);
+const Flip = mongoose.model("Flip", flipSchema);
 
 export default Flip;
