@@ -3,7 +3,7 @@ import uploadOnCloudinary from "../config/cloudinary.js";
 const getCurrentUser = async (req, res) => {
   try {
     const userId = req.userId;
-    const user = await User.findById(userId).select(
+    const user = await User.findById(userId).populate("posts").select(
       "-password -resetPassOtp -resetPassOtpVerified -resetPassOtpExpiry",
     );
 
