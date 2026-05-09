@@ -67,10 +67,11 @@ function EditProfile() {
   return (
     <div className="w-full min-h-screen bg-black flex justify-center">
       <div
-        className="text-[20px] cursor-pointer text-white fixed left-0  py-6 px-5"
+        className="text-[20px] cursor-pointer text-white fixed left-0 flex items-center gap-2.5 lg:gap-5  py-6 px-5"
         onClick={() => navigate(`/profile/${userData.username}`)}
       >
         <FaArrowLeftLong />
+        <div className="text-[15px] lg:text-[20px]">Edit Profile</div>
       </div>
       <div className=" w-full max-w-180 flex flex-col items-center mt-15 lg:mt-10 gap-3 mb-2 text-white">
         <div className="w-25 h-25  border-black border-2 rounded-full cursor-pointer overflow-hidden">
