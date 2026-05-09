@@ -10,6 +10,7 @@ import getSuggestedUsers from "./hooks/getSuggestedUsers";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import { Toaster } from "react-hot-toast";
+import Upload from "./pages/Upload";
 function App() {
   getCurrentUser();
   getSuggestedUsers();
@@ -41,6 +42,10 @@ function App() {
         <Route
           path="/edit-profile"
           element={userData ? <EditProfile /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/upload"
+          element={userData ? <Upload /> : <Navigate to={"/login"} />}
         />
       </Routes>
     </div>
