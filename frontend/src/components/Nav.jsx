@@ -17,7 +17,7 @@ function Nav() {
       <div>
         <LuSquarePlay className="text-white text-[25px] cursor-pointer"/>
       </div>
-      <div>
+      <div onClick={()=>navigate("/upload")}>
         <FaRegPlusSquare className="text-white text-[25px] cursor-pointer"/>
       </div>
       <div>
