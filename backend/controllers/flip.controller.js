@@ -26,7 +26,7 @@ const uploadFlip = async (req, res) => {
     });
 
     const user = await User.findById(req.userId);
-    user.posts.push(flip._id);
+    user.flips.push(flip._id);
     await user.save();
 
     const populatedFlip = await Flip.findById(flip._id).populate(
