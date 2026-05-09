@@ -38,9 +38,9 @@ const uploadPost = async (req, res) => {
   }
 };
 
-const getAllMyPosts = async (req, res) => {
+const getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find({ author: req.userId }).populate(
+    const posts = await Post.find({}).populate(
       "author",
       "name username avatar",
     );
@@ -133,4 +133,4 @@ const savedPosts = async (req, res) => {
   }
 };
 
-export { uploadPost, getAllMyPosts, likePost, commentPost,savedPosts };
+export { uploadPost, getAllPosts, likePost, commentPost,savedPosts };
