@@ -19,7 +19,7 @@ const getSuggestedUsers = ()=>{
         }
 
         fetchSuggetsedUsesData();
-    },[userData])
+    },[dispatch])
 
 }
 
