@@ -43,7 +43,7 @@ const getAllPosts = async (req, res) => {
     const posts = await Post.find({}).populate(
       "author",
       "name username avatar",
-    );
+    ).populate("comments.author","name username avatar").sort({createdAt:-1});
     return res.status(200).json(posts);
   } catch (error) {
     return res.status(500).json({ message: `getAllPosts error: ${error}` });
@@ -95,12 +95,17 @@ const commentPost = async (req, res) => {
 
     await post.save();
 
-    await post.populate("author", "name username avatar");
-    await post.populate("comments.author");
+    const populatedPost = await Post.findById(postId)
+      .populate("author", "name username avatar")
+      .populate({
+        path: "comments.author",
+        select: "name username avatar"
+      });
 
-    return res.status(200).json(post);
+    return res.status(200).json(populatedPost);
   } catch (error) {
-    return res.status(500).json({ message: `commentPost error: ${error}` });
+    console.error(error); 
+    return res.status(500).json({ message: `Internal server error` });
   }
 };
 

@@ -25,7 +25,7 @@ function VideoPlayer({ media }) {
 
   return (
     <div
-      className="w-full h-full relative cursor-pointer rounded-2xl overflow-hidden bg-zinc-950 flex items-center justify-center"
+      className="w-full h-full relative cursor-pointer  overflow-hidden bg-zinc-950 flex items-center justify-center"
       onClick={togglePlay}
     >
       <video

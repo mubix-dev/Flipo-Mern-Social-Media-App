@@ -7,6 +7,7 @@ import { setProfileData, setUserData } from "../redux/userSlice";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import dp from "../assets/dp.jpg";
 import Nav from "../components/Nav";
+import FollowBtn from "../components/FollowBtn";
 
 function Profile() {
   const { username } = useParams();
@@ -74,7 +75,7 @@ function Profile() {
             {profileData?.name}
           </div>
           <div className="text-[13px] lg:text-[15px]  text-gray-500 font-medium">
-            {profileData?.profession }
+            {profileData?.profession}
           </div>
           <div className="text-[12px] lg:text-[15px]  text-gray-500 font-medium truncate">
             {profileData?.bio}
@@ -90,15 +91,11 @@ function Profile() {
           <div className="flex gap-1">
             <div>{profileData?.followers.length}</div>
             <div className=" flex justify-center items-center relative">
-              <div className="w-5 h-5 lg:w-8 lg:h-8 rounded-full overflow-hidden border-2 border-black">
-                <img className="w-full object-cover" src={dp} alt="" />
-              </div>
-              <div className="w-5 h-5 lg:w-8 lg:h-8 rounded-full absolute border-2 left-2 border-black overflow-hidden">
-                <img className="w-full object-cover" src={dp} alt="" />
-              </div>
-              <div className="w-5 h-5 lg:w-8 lg:h-8 rounded-full absolute border-2 left-4 border-black overflow-hidden">
-                <img className="w-full object-cover" src={dp} alt="" />
-              </div>
+              {profileData?.followers.slice(0, 3).map((user, index) => (
+                <div key={index} className={`w-5 h-5 lg:w-8 lg:h-8 rounded-full overflow-hidden border-2 border-black ${index > 0 ? `absolute left-${index * 2}`:""} `}>
+                  <img className="w-full object-cover aspect-square" src={user.avatar || dp} alt="" />
+                </div>
+              ))}
             </div>
           </div>
           <div className="lg:text-[20px]">followers</div>
@@ -107,15 +104,11 @@ function Profile() {
           <div className="flex gap-1">
             <div>{profileData?.following.length}</div>
             <div className=" flex justify-center items-center relative">
-              <div className="w-5 h-5 lg:w-8 lg:h-8 rounded-full overflow-hidden border-2 border-black">
-                <img className="w-full object-cover" src={dp} alt="" />
-              </div>
-              <div className="w-5 h-5 lg:w-8 lg:h-8 rounded-full absolute border-2 left-2 border-black overflow-hidden">
-                <img className="w-full object-cover" src={dp} alt="" />
-              </div>
-              <div className="w-5 h-5 lg:w-8 lg:h-8 rounded-full absolute border-2 left-4 border-black overflow-hidden">
-                <img className="w-full object-cover" src={dp} alt="" />
-              </div>
+              {profileData?.following.slice(0, 3).map((user, index) => (
+                <div key={index} className={`w-5 h-5 lg:w-8 lg:h-8 rounded-full overflow-hidden border-2 border-black ${index > 0 ? `absolute left-${index * 2}`:""} `}>
+                  <img className="w-full object-cover aspect-square" src={user.avatar || dp} alt="" />
+                </div>
+              ))}
             </div>
           </div>
           <div className="lg:text-[20px]">following</div>
@@ -123,15 +116,22 @@ function Profile() {
       </div>
       <div className="w-full  flex justify-center items-center py-5 gap-5">
         {profileData?._id == userData._id && (
-          <button className="bg-violet-500 py-1 px-2.5 rounded-lg cursor-pointer text-white text-[15px] lg:text-[20px] hover:bg-violet-600 duration-100" onClick={()=>navigate("/edit-profile")}>
+          <button
+            className="bg-violet-500 py-1 px-2.5 rounded-lg cursor-pointer text-white text-[15px] lg:text-[20px] hover:bg-violet-600 duration-100"
+            onClick={() => navigate("/edit-profile")}
+          >
             Edit Profile
           </button>
         )}
         {profileData?._id != userData._id && (
           <>
-            <button className="bg-violet-500 py-1 px-5 rounded-lg cursor-pointer text-white text-[15px] lg:text-[20px] hover:bg-violet-600 duration-100">
-              Follow
-            </button>
+            <FollowBtn
+              css={
+                "bg-violet-500 py-1 px-5 rounded-lg cursor-pointer text-white text-[15px] lg:text-[20px] hover:bg-violet-600 duration-100"
+              }
+              targetedUserId={profileData?._id}
+              onFollowChange={handleProfile}
+            />
             <button className="bg-violet-500 py-1 px-2.5 rounded-lg cursor-pointer text-white text-[15px] lg:text-[20px] hover:bg-violet-600 duration-100">
               Message
             </button>
@@ -139,10 +139,8 @@ function Profile() {
         )}
       </div>
       <div className="w-full min-h-screen flex justify-center">
-        <div className="w-full max-w-180 bg-white rounded-t-4xl">
-
-        </div>
-        <Nav/>
+        <div className="w-full max-w-180 bg-white rounded-t-4xl"></div>
+        <Nav />
       </div>
     </div>
   );

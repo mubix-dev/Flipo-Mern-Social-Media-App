@@ -11,9 +11,13 @@ import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import { Toaster } from "react-hot-toast";
 import Upload from "./pages/Upload";
+import getAllPosts from "./hooks/getAllPosts";
+import getAllFlips from "./hooks/getALLFlips";
 function App() {
   getCurrentUser();
   getSuggestedUsers();
+  getAllPosts();
+  getAllFlips();
   const { userData } = useSelector((state) => state.user);
   return (
     <div>

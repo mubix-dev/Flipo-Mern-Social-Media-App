@@ -1,8 +1,11 @@
 import React from "react";
 import dp from "../assets/dp.jpg";
 import { useNavigate } from "react-router-dom";
+import FollowBtn from "./FollowBtn";
+import axios from "axios";
 function OtherUser({ user }) {
   const navigate = useNavigate()
+  
   return (
     <div className="w-full flex  justify-between items-center px-5 ">
       <div className="flex justify-center items-center gap-2.5">
@@ -16,11 +19,7 @@ function OtherUser({ user }) {
           <div className="text-gray-500 text-[12px] ">{user.name}</div>
         </div>
       </div>
-      <button
-        className="text-white text-[12px] font-medium  cursor-pointer bg-violet-500 hover:bg-violet-600 rounded-md px-2 py-1 "
-      >
-        Follow
-      </button>
+      <FollowBtn css={"text-white text-[12px] font-medium  cursor-pointer bg-violet-500 hover:bg-violet-600 rounded-md px-2 py-1 "} targetedUserId={user._id}/>
     </div>
   );
 }
