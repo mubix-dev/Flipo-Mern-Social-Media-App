@@ -16,11 +16,15 @@ function FlipsPage() {
         <div className="text-[15px] lg:text-[20px]">Flips</div>
       </div>
       <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory flex  items-center flex-col">
-        {flipData.map((flip,index)=>(
-            <div className="h-screen snap-start">
-                <Flip flip={flip}/>
-            </div>
-        ))}
+        {Array.isArray(flipData) ? (
+            flipData.map((flip) => (
+                <div key={flip._id} className="h-screen snap-start">
+                    <Flip flip={flip} />
+                </div>
+            ))
+        ) : (
+            <div className="text-white">Loading flips...</div>
+        )}
       </div>
     </div>
   );

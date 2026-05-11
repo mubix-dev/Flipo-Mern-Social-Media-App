@@ -27,12 +27,9 @@ function Feed() {
 
       <div className="w-full min-h-screen flex flex-col items-center gap-3 p-5 pt-10 bg-slate-100 rounded-t-[50px]  relative overflow-auto ">
         <Nav />
-        {postData?.map((post) => (
-          <Post key={post._id} post={post} />
-        ))}
-        <div className="h-20">
-
-        </div>
+        {postData?.length > 0 ?
+          postData?.map((post) => <Post key={post._id} post={post} />):<div className="w-full h-100 flex justify-center items-center text-[15px] lg:text-[20px] font-semibold text-gray-500 ">No Posts Yet</div>}
+        <div className="h-20"></div>
       </div>
     </div>
   );

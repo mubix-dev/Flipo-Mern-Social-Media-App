@@ -60,7 +60,7 @@ function Upload() {
         formData.append("mediaType",mediaType);
         formData.append("media",backendMedia)
         const result = await axios.post(`${serverURL}/api/post/upload`,formData,{withCredentials:true});
-        dispatch(setPostData([...post,result.data]))
+        dispatch(setPostData([...postData,result.data]))
         setLoading(false)
         navigate("/")
     } catch (error) {

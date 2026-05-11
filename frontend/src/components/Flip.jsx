@@ -204,7 +204,7 @@ function Flip({ flip }) {
           className="flex flex-col items-center gap-1 cursor-pointer"
           onClick={handleLike}
         >
-          {flip.likes.includes(userData?._id) ? (
+          {flip.likes?.includes(userData?._id) ? (
             <FaHeart className="text-red-500 text-3xl transition-transform active:scale-125" />
           ) : (
             <FaRegHeart className="text-3xl transition-transform active:scale-125" />

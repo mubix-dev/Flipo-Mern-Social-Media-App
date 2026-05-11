@@ -20,7 +20,7 @@ const signup = async (req, res) => {
     if(username.length < 3){
       return res.status(400).json({ message: "Username is too short" });
     }
-    if(name.length > 3){
+    if(name.length < 3){
       return res.status(400).json({ message: "Name is too short" });
     }
     const existedUser = await User.findOne({
