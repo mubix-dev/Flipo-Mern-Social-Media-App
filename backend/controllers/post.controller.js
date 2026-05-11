@@ -138,4 +138,5 @@ const savedPosts = async (req, res) => {
   }
 };
 
+
 export { uploadPost, getAllPosts, likePost, commentPost,savedPosts };
