@@ -13,6 +13,7 @@ import { Toaster } from "react-hot-toast";
 import Upload from "./pages/Upload";
 import getAllPosts from "./hooks/getAllPosts";
 import getAllFlips from "./hooks/getALLFlips";
+import FlipsPage from "./pages/FlipsPage";
 function App() {
   getCurrentUser();
   getSuggestedUsers();
@@ -51,6 +52,11 @@ function App() {
           path="/upload"
           element={userData ? <Upload /> : <Navigate to={"/login"} />}
         />
+        <Route
+          path="/flips"
+          element={userData ? <FlipsPage /> : <Navigate to={"/login"} />}
+        />
+        
       </Routes>
     </div>
   );

@@ -1,9 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { VscUnmute, VscMute } from "react-icons/vsc";
-import { FaRegPlayCircle } from "react-icons/fa";
+import { FaPlay } from "react-icons/fa6";
 
 function VideoPlayer({ media }) {
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef(null);
 
@@ -23,32 +23,63 @@ function VideoPlayer({ media }) {
     setIsMuted(videoRef.current.muted);
   };
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const video = videoRef.current;
+        if (!video) return;
+        
+        if (entry.isIntersecting) {
+          video.play().catch(() => {
+             // Handle browsers that block autoplay without user interaction
+             setIsPlaying(false);
+          });
+          setIsPlaying(true);
+        } else {
+          video.pause();
+          setIsPlaying(false);
+        }
+      },
+      { threshold: 0.6 },
+    );
+
+    if (videoRef.current) {
+      observer.observe(videoRef.current);
+    }
+
+    return () => {
+      if (videoRef.current) {
+        observer.unobserve(videoRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div
-      className="w-full h-full relative cursor-pointer  overflow-hidden bg-zinc-950 flex items-center justify-center"
+      className="w-full h-full relative cursor-pointer overflow-hidden bg-zinc-950 flex items-center justify-center"
       onClick={togglePlay}
     >
       <video
         ref={videoRef}
-        className="max-w-full max-h-full object-contain"
+        className="w-full h-full object-contain bg-black"
         src={media}
         autoPlay
-        muted
         loop
+        muted={isMuted}
         playsInline
       />
 
       <div
-        className="absolute bottom-4 right-4 bg-black/60 p-2.5 rounded-full text-white backdrop-blur-sm transition-transform active:scale-90"
+        className="absolute bottom-4 right-4 bg-black/60 p-2.5 rounded-full text-white backdrop-blur-sm transition-transform active:scale-90 z-20"
         onClick={toggleMute}
       >
         {isMuted ? <VscMute size={22} /> : <VscUnmute size={22} />}
       </div>
 
       {!isPlaying && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity">
-          <span className="text-white text-6xl opacity-80">
-            <FaRegPlayCircle />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity z-10">
+          <span className="text-white text-6xl opacity-20 pointer-events-none">
+            <FaPlay />
           </span>
         </div>
       )}

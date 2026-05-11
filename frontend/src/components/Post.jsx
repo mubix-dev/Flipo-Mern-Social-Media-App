@@ -9,6 +9,7 @@ import {
   FaHeart,
   FaBookmark,
 } from "react-icons/fa";
+
 import { IoMdSend } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -75,7 +76,6 @@ function Post({ post }) {
         { withCredentials: true },
       );
       dispatch(setUserData(result.data));
-      // Added a success toast for better UX
       const isSaved = result.data?.saved?.some(
         (item) => (item._id || item) === post._id,
       );
@@ -86,7 +86,7 @@ function Post({ post }) {
   };
 
   return (
-    <div className="w-full lg:max-w-[95%] flex flex-col bg-black shadow-lg overflow-hidden rounded-t-4xl text-white mb-4">
+    <div className="w-full lg:max-w-[95%] flex flex-col bg-black shadow-lg overflow-hidden rounded-t-2xl text-white mb-0 rounded-b-2xl">
       {/* Header */}
       <div className="w-full h-14 md:h-16 flex justify-between items-center py-10 px-5">
         <div className="flex items-center gap-3">
@@ -107,7 +107,6 @@ function Post({ post }) {
         {userData._id !== post.author._id && <FollowBtn css={"bg-violet-600 hover:bg-violet-700 rounded-lg px-4 py-1.5 text-xs md:text-sm font-semibold transition-all active:scale-95 cursor-pointer"} targetedUserId={post.author?._id} />} 
       </div>
 
-      {/* Media Section */}
       <div className="w-full bg-zinc-900 flex items-center justify-center">
         {post.mediaType === "image" ? (
           <img
@@ -122,7 +121,6 @@ function Post({ post }) {
         )}
       </div>
 
-      {/* Actions Area */}
       <div className="p-4 w-full flex flex-col gap-2">
         <div className="w-full flex justify-between items-center">
           <div className="flex gap-4">
@@ -151,7 +149,6 @@ function Post({ post }) {
               </span>
             </div>
           </div>
-          {/* Optional chaining added for userData safety */}
           {!userData?.saved?.some((item) => (item._id || item) === post._id) ? (
             <FaRegBookmark
               className="text-xl cursor-pointer hover:text-zinc-400 transition-colors"
@@ -187,7 +184,7 @@ function Post({ post }) {
                   <span className="text-[10px] font-bold text-zinc-500 mb-0.5 px-1">
                     {com.author?.username}
                   </span>
-                  <div className="bg-zinc-900 px-3 py-1 rounded-2xl rounded-tl-none text-sm text-zinc-200 break-words">
+                  <div className="bg-zinc-900 px-3 py-1 rounded-2xl rounded-tl-none text-sm text-zinc-200 wrap-break-word">
                     {com.message}
                   </div>
                 </div>

@@ -14,7 +14,7 @@ function Nav() {
       <div>
         <GoHomeFill className="text-white text-[25px] cursor-pointer" onClick={()=>navigate("/")} />
       </div>
-      <div>
+      <div onClick={()=>navigate("/flips")}>
         <LuSquarePlay className="text-white text-[25px] cursor-pointer"/>
       </div>
       <div onClick={()=>navigate("/upload")}>

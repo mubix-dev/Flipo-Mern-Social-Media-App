@@ -60,7 +60,7 @@ function Upload() {
         formData.append("mediaType",mediaType);
         formData.append("media",backendMedia)
         const result = await axios.post(`${serverURL}/api/post/upload`,formData,{withCredentials:true});
-        dispatch(setPostData([...posts,result.data]))
+        dispatch(setPostData([...post,result.data]))
         setLoading(false)
         navigate("/")
     } catch (error) {
@@ -146,7 +146,7 @@ function Upload() {
           className="w-[90%] max-w-md aspect-square bg-zinc-950 border-2 border-dashed border-zinc-800 flex flex-col gap-3 justify-center items-center mt-10 hover:bg-zinc-900 hover:border-zinc-700 rounded-3xl text-zinc-500 cursor-pointer transition-colors"
           onClick={() => mediaRef.current.click()}
         >
-          <input type="file" hidden ref={mediaRef} onChange={handleMedia} />
+          <input type="file" accept={uploadType == "flip"?"video/*":""} hidden ref={mediaRef} onChange={handleMedia} />
           <FiUpload className="text-4xl" />
           <span className="text-lg font-medium">Select {uploadType} media</span>
         </div>

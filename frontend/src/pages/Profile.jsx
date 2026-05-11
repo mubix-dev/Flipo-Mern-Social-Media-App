@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { serverURL } from "../main";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,11 +8,15 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import dp from "../assets/dp.jpg";
 import Nav from "../components/Nav";
 import FollowBtn from "../components/FollowBtn";
+import Post from "../components/Post";
 
 function Profile() {
   const { username } = useParams();
   const dispatch = useDispatch();
   const { profileData, userData } = useSelector((state) => state.user);
+  const { postData } = useSelector((state) => state.post);
+
+  const [showPosts, setShowPosts] = useState("all");
 
   const navigate = useNavigate();
   const handleProfile = async () => {
@@ -92,8 +96,15 @@ function Profile() {
             <div>{profileData?.followers.length}</div>
             <div className=" flex justify-center items-center relative">
               {profileData?.followers.slice(0, 3).map((user, index) => (
-                <div key={index} className={`w-5 h-5 lg:w-8 lg:h-8 rounded-full overflow-hidden border-2 border-black ${index > 0 ? `absolute left-${index * 2}`:""} `}>
-                  <img className="w-full object-cover aspect-square" src={user.avatar || dp} alt="" />
+                <div
+                  key={index}
+                  className={`w-5 h-5 lg:w-8 lg:h-8 rounded-full overflow-hidden border-2 border-black ${index > 0 ? `absolute left-${index * 2}` : ""} `}
+                >
+                  <img
+                    className="w-full object-cover aspect-square"
+                    src={user.avatar || dp}
+                    alt=""
+                  />
                 </div>
               ))}
             </div>
@@ -105,8 +116,15 @@ function Profile() {
             <div>{profileData?.following.length}</div>
             <div className=" flex justify-center items-center relative">
               {profileData?.following.slice(0, 3).map((user, index) => (
-                <div key={index} className={`w-5 h-5 lg:w-8 lg:h-8 rounded-full overflow-hidden border-2 border-black ${index > 0 ? `absolute left-${index * 2}`:""} `}>
-                  <img className="w-full object-cover aspect-square" src={user.avatar || dp} alt="" />
+                <div
+                  key={index}
+                  className={`w-5 h-5 lg:w-8 lg:h-8 rounded-full overflow-hidden border-2 border-black ${index > 0 ? `absolute left-${index * 2}` : ""} `}
+                >
+                  <img
+                    className="w-full object-cover aspect-square"
+                    src={user.avatar || dp}
+                    alt=""
+                  />
                 </div>
               ))}
             </div>
@@ -138,10 +156,71 @@ function Profile() {
           </>
         )}
       </div>
-      <div className="w-full min-h-screen flex justify-center">
-        <div className="w-full max-w-180 bg-white rounded-t-4xl"></div>
-        <Nav />
+      <div className="w-full max-w-2xl bg-white rounded-t-[40px] min-h-[60vh] flex flex-col items-center p-4 gap-4 mt-2">
+        {/* Decorative Handle */}
+        <div className="w-12 h-1.5 bg-zinc-300 rounded-full mb-2"></div>
+
+        {/* Tab Switcher (Only visible on own profile) */}
+        {profileData?._id === userData?._id && (
+          <div className="w-[80%] max-w-xs h-12 bg-black rounded-full flex p-1 mb-4 shadow-xl">
+            {["all", "saved"].map((type) => (
+              <div
+                key={type}
+                className={`${
+                  showPosts === type ? "bg-white text-black" : "text-zinc-500"
+                } flex-1 flex justify-center items-center font-bold rounded-full cursor-pointer transition-all duration-300 capitalize text-sm`}
+                onClick={() => setShowPosts(type)}
+              >
+                {type}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Dynamic Post Feed */}
+        <div className="w-full flex flex-col items-center gap-6 mt-2">
+          {showPosts === "all" ? (
+            postData.filter(
+              (post) =>
+                post.author?._id?.toString() === profileData?._id?.toString(),
+            ).length > 0 ? (
+              postData
+                .filter(
+                  (post) =>
+                    post.author?._id?.toString() ===
+                    profileData?._id?.toString(),
+                )
+                .map((post) => <Post key={post._id} post={post} />)
+            ) : (
+              <div className="py-20 text-center">
+                <p className="text-zinc-400 font-semibold">
+                  No posts shared yet.
+                </p>
+              </div>
+            )
+          ) : 
+          postData.filter((post) =>
+              userData?.saved?.some(
+                (s) => (s._id || s).toString() === post._id.toString(),
+              ),
+            ).length > 0 ? (
+            postData
+              .filter((post) =>
+                userData?.saved?.some(
+                  (s) => (s._id || s).toString() === post._id.toString(),
+                ),
+              )
+              .map((post) => <Post key={post._id} post={post} />)
+          ) : (
+            <div className="py-20 text-center">
+              <p className="text-zinc-400 font-semibold">No saved posts yet.</p>
+            </div>
+          )}
+        </div>
+
+        <div className="h-24"></div>
       </div>
+      <Nav />
     </div>
   );
 }

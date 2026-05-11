@@ -6,7 +6,7 @@ const getCurrentUser = async (req, res) => {
     const user = await User.findById(userId)
       .select(
         "-password -resetPassOtp -resetPassOtpVerified -resetPassOtpExpiry",
-      )
+      ).populate("posts flips")
 
     if (!userId) {
       return res.status(400).json({ message: "User not found!" });

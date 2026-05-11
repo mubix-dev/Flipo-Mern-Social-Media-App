@@ -15,7 +15,7 @@ function Feed() {
           <FiHeart className="text-white w-5 h-5 " />
         </div>
       </div>
-      <div className="w-full flex items-center px-3 py-5 gap-5 overflow-auto no-scrollbar">
+      <div className="w-full flex items-center px-3 py-5 gap-5 overflow-auto ">
         <StoryDp name={"jhjhj"} />
         <StoryDp name={"jhjhj"} />
         <StoryDp name={"jhjhj"} />
