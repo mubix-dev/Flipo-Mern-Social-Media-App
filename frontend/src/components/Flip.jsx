@@ -172,7 +172,7 @@ function Flip({ flip }) {
       </div>
 
       {/* Info Overlay */}
-      <div className="absolute bottom-0 left-0 w-full px-4 py-8 bg-gradient-to-t from-black/80 to-transparent text-white flex flex-col gap-2 pointer-events-none">
+      <div className="absolute bottom-0 left-0 w-full px-4 py-8 bg-linear-to-t from-black/80 to-transparent text-white flex flex-col gap-2 pointer-events-none">
         <div className="flex items-center gap-3 pointer-events-auto">
           <img
             src={flip?.author?.avatar || dp}
