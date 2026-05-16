@@ -14,12 +14,15 @@ import Upload from "./pages/Upload";
 import getAllPosts from "./hooks/getAllPosts";
 import getAllFlips from "./hooks/getALLFlips";
 import FlipsPage from "./pages/FlipsPage";
+import StoryPage from "./pages/StoryPage";
+import getAllStories from "./hooks/getALLStories";
 function App() {
   getCurrentUser();
+  const { userData } = useSelector((state) => state.user);
   getSuggestedUsers();
   getAllPosts();
   getAllFlips();
-  const { userData } = useSelector((state) => state.user);
+  getAllStories();
   return (
     <div>
       <Toaster position="top-center" reverseOrder={false} />
@@ -55,6 +58,10 @@ function App() {
         <Route
           path="/flips"
           element={userData ? <FlipsPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/story/:username"
+          element={userData ? <StoryPage /> : <Navigate to={"/login"} />}
         />
         
       </Routes>
