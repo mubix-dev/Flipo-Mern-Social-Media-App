@@ -6,7 +6,8 @@ const userSlice = createSlice({
         userData:null,
         suggestedUsers:null,
         profileData:null,
-        following:[]
+        following:[],
+        followingList:null
     },
     reducers:{
         setUserData : (state,action)=>{
@@ -23,6 +24,9 @@ const userSlice = createSlice({
             const targetedUserId = action.payload;
             state.following.push(targetedUserId)
         },
+        setFollowingList: (state,action)=>{
+            state.followingList = action.payload;
+        },
         toggleFollowing:(state,action)=>{
             const targetedUserId = action.payload;
             if(state.following.includes(targetedUserId)){
@@ -34,5 +38,5 @@ const userSlice = createSlice({
     }
 })
 
-export const {setUserData,setSuggestedUsersData,setProfileData,setFollowing,toggleFollowing} = userSlice.actions;
+export const {setUserData,setSuggestedUsersData,setProfileData,setFollowing,toggleFollowing,setFollowingList} = userSlice.actions;
 export default userSlice.reducer;
