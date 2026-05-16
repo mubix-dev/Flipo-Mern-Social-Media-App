@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./pages/Home";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import getCurrentUser from "./hooks/getCurrentUser";
 import getSuggestedUsers from "./hooks/getSuggestedUsers";
 import Profile from "./pages/Profile";
@@ -18,13 +18,37 @@ import StoryPage from "./pages/StoryPage";
 import getAllStories from "./hooks/getALLStories";
 import ChatPage from "./pages/ChatPage";
 import MessagesField from "./pages/MessagesField";
+import io from "socket.io-client";
+import { serverURL } from "./main";
+import { setOnlineUsers, setSocket } from "./redux/socketSlice";
+import getFollowing from "./hooks/getFollowing";
 function App() {
-  getCurrentUser();
+  const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.user);
+  const { socket } = useSelector((state) => state.socket);
+  useEffect(() => {
+    if (userData?._id) {
+      const socketIo = io(serverURL, {
+        query: { userId: userData._id },
+      });
+      dispatch(setSocket(socketIo));
+      socketIo.on("getOnlineUsers", (user) => {
+        dispatch(setOnlineUsers(user));
+      });
+      return ()=>socketIo.close();
+    } else {
+      if (socket) {
+        socket.close();
+        dispatch(setSocket(null));
+      }
+    }
+  }, [userData,dispatch]);
+  getCurrentUser();
   getSuggestedUsers();
   getAllPosts();
   getAllFlips();
   getAllStories();
+  getFollowing();
   return (
     <div>
       <Toaster position="top-center" reverseOrder={false} />
@@ -73,7 +97,6 @@ function App() {
           path="/messageField"
           element={userData ? <MessagesField /> : <Navigate to={"/login"} />}
         />
-        
       </Routes>
     </div>
   );
