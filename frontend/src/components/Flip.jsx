@@ -22,7 +22,6 @@ function Flip({ flip }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // States
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -30,14 +29,12 @@ function Flip({ flip }) {
   const [commentText, setCommentText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Animation State
   const [showHeartAnim, setShowHeartAnim] = useState(false);
   const lastTap = useRef(0);
 
   const { userData } = useSelector((state) => state.user);
   const { flipData } = useSelector((state) => state.flip);
 
-  // Intersection Observer for Autoplay
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -46,7 +43,6 @@ function Flip({ flip }) {
 
         if (entry.isIntersecting) {
           video.play().catch(() => {
-            // Handle browsers that block autoplay without user interaction
             setIsPlaying(false);
           });
           setIsPlaying(true);
@@ -107,7 +103,6 @@ function Flip({ flip }) {
     }
   };
 
-  // Double Tap Logic
   const handleDoubleTap = () => {
     setShowHeartAnim(true);
     setTimeout(() => setShowHeartAnim(false), 1000);
@@ -151,7 +146,7 @@ function Flip({ flip }) {
         onClick={togglePlay}
       />
 
-      {/* Double Tap Heart Animation */}
+
       {showHeartAnim && (
         <div className="absolute flex items-center justify-center pointer-events-none z-40">
           <FaHeart className="text-red-500 text-9xl animate-ping opacity-80" />
@@ -163,7 +158,7 @@ function Flip({ flip }) {
         </div>
       )}
 
-      {/* Mute Toggle */}
+
       <div
         className="absolute top-5 right-5 z-20 bg-black/40 p-2 rounded-full text-white cursor-pointer"
         onClick={() => setIsMuted(!isMuted)}
@@ -171,12 +166,11 @@ function Flip({ flip }) {
         {isMuted ? <VscMute size={20} /> : <VscUnmute size={20} />}
       </div>
 
-      {/* Info Overlay */}
       <div className="absolute bottom-0 left-0 w-full px-4 py-8 bg-linear-to-t from-black/80 to-transparent text-white flex flex-col gap-2 pointer-events-none">
         <div className="flex items-center gap-3 pointer-events-auto">
           <img
             src={flip?.author?.avatar || dp}
-            className="w-10 h-10 rounded-full border border-zinc-500 cursor-pointer"
+            className="w-10 h-10 rounded-full  cursor-pointer"
             onClick={() => navigate(`/profile/${flip?.author.username}`)}
             alt=""
           />
@@ -198,7 +192,6 @@ function Flip({ flip }) {
         <p className="text-sm line-clamp-2 max-w-[80%]">{flip?.caption}</p>
       </div>
 
-      {/* Sidebar Actions */}
       <div className="absolute bottom-24 right-4 flex flex-col items-center gap-6 text-white z-10">
         <div
           className="flex flex-col items-center gap-1 cursor-pointer"
@@ -222,15 +215,13 @@ function Flip({ flip }) {
         </div>
       </div>
 
-      {/* Progress Bar */}
       <div className="absolute bottom-0 left-0 w-full h-1 bg-zinc-800 z-30">
         <div
-          className="h-full bg-violet-600 transition-all duration-100 ease-linear"
+          className="h-full bg-violet-600 transition-all duration-500 ease-linear"
           style={{ width: `${progress}%` }}
         ></div>
       </div>
 
-      {/* --- COMMENTS BOTTOM SHEET --- */}
       <div
         className={`absolute inset-0 z-50 transition-all duration-300 ${showComments ? "translate-y-0" : "translate-y-full"}`}
       >
