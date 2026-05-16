@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { VscUnmute, VscMute } from "react-icons/vsc";
 import { FaPlay } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 function VideoPlayer({ media }) {
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef(null);
+  const navigate = useNavigate();
+  
 
   const togglePlay = () => {
     if (videoRef.current.paused) {
@@ -28,11 +31,11 @@ function VideoPlayer({ media }) {
       ([entry]) => {
         const video = videoRef.current;
         if (!video) return;
-        
+
         if (entry.isIntersecting) {
           video.play().catch(() => {
-             // Handle browsers that block autoplay without user interaction
-             setIsPlaying(false);
+            
+            setIsPlaying(false);
           });
           setIsPlaying(true);
         } else {
