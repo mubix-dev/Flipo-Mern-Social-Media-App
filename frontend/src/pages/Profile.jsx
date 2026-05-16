@@ -10,12 +10,13 @@ import Nav from "../components/Nav";
 import FollowBtn from "../components/FollowBtn";
 import Post from "../components/Post";
 import { ClipLoader } from "react-spinners";
+import { setSelectedUser } from "../redux/messageSlice";
 
 function Profile() {
   const { username } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   const { profileData, userData } = useSelector((state) => state.user);
   const { postData } = useSelector((state) => state.post);
   const [loading, setLoading] = useState(true);
@@ -26,7 +27,7 @@ function Profile() {
     try {
       const result = await axios.get(
         `${serverURL}/api/user/getProfile/${username}`,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       dispatch(setProfileData(result.data));
     } catch (error) {
@@ -37,16 +38,18 @@ function Profile() {
   };
 
   useEffect(() => {
-    dispatch(setProfileData(null)); 
+    dispatch(setProfileData(null));
     handleProfile();
   }, [username]);
 
   const handleLogout = async () => {
     try {
-      await axios.get(`${serverURL}/api/auth/logout`, { withCredentials: true });
+      await axios.get(`${serverURL}/api/auth/logout`, {
+        withCredentials: true,
+      });
       dispatch(setUserData(null));
       dispatch(setProfileData(null));
-      navigate("/login"); 
+      navigate("/login");
     } catch (error) {
       console.log(error);
     }
@@ -54,10 +57,14 @@ function Profile() {
 
   const filteredPosts = useMemo(() => {
     if (showPosts === "all") {
-      return postData.filter(post => post.author?._id?.toString() === profileData?._id?.toString());
+      return postData.filter(
+        (post) => post.author?._id?.toString() === profileData?._id?.toString(),
+      );
     } else {
-      return postData.filter(post => 
-        userData?.saved?.some(s => (s._id || s).toString() === post._id.toString())
+      return postData.filter((post) =>
+        userData?.saved?.some(
+          (s) => (s._id || s).toString() === post._id.toString(),
+        ),
       );
     }
   }, [showPosts, postData, profileData?._id, userData?.saved]);
@@ -73,37 +80,57 @@ function Profile() {
   return (
     <div className="w-full min-h-screen bg-black flex flex-col items-center">
       <div className="w-full h-20 flex justify-between items-center text-white px-5 sticky top-0 bg-black z-50">
-        <div className="text-[20px] cursor-pointer" onClick={() => navigate("/")}>
+        <div
+          className="text-[20px] cursor-pointer"
+          onClick={() => navigate("/")}
+        >
           <FaArrowLeftLong />
         </div>
         <div className="text-[18px] font-bold truncate max-w-[50%]">
           {profileData?.username}
         </div>
-        <div className="text-[16px] text-blue-500 cursor-pointer font-semibold" onClick={handleLogout}>
+        <div
+          className="text-[16px] text-blue-500 cursor-pointer font-semibold"
+          onClick={handleLogout}
+        >
           Log Out
         </div>
       </div>
 
       <div className="w-full flex gap-4 lg:gap-10 py-5 px-5 justify-center items-center">
         <div className="w-20 h-20 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-zinc-800 shrink-0">
-          <img className="w-full h-full object-cover" src={profileData?.avatar || dp} alt="" />
+          <img
+            className="w-full h-full object-cover"
+            src={profileData?.avatar || dp}
+            alt=""
+          />
         </div>
         <div className="flex-1 max-w-50">
-          <div className="text-white font-bold text-lg lg:text-2xl">{profileData?.name}</div>
-          <div className="text-sm lg:text-base text-zinc-400 font-medium">{profileData?.profession}</div>
-          <div className="text-xs lg:text-sm text-zinc-500 mt-1 line-clamp-2">{profileData?.bio}</div>
+          <div className="text-white font-bold text-lg lg:text-2xl">
+            {profileData?.name}
+          </div>
+          <div className="text-sm lg:text-base text-zinc-400 font-medium">
+            {profileData?.profession}
+          </div>
+          <div className="text-xs lg:text-sm text-zinc-500 mt-1 line-clamp-2">
+            {profileData?.bio}
+          </div>
         </div>
       </div>
 
       <div className="w-full flex gap-8 lg:gap-16 px-5 justify-center items-center mt-2">
         <div className="flex flex-col items-center text-white">
-          <span className="font-bold text-lg">{profileData?.posts?.length || 0}</span>
+          <span className="font-bold text-lg">
+            {profileData?.posts?.length || 0}
+          </span>
           <span className="text-zinc-500 text-sm">posts</span>
         </div>
-        
+
         <div className="flex flex-col items-center text-white">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-lg">{profileData?.followers?.length || 0}</span>
+            <span className="font-bold text-lg">
+              {profileData?.followers?.length || 0}
+            </span>
             <div className="flex relative h-6 w-12">
               {profileData?.followers?.slice(0, 3).map((user, index) => (
                 <div
@@ -111,7 +138,11 @@ function Profile() {
                   className="w-6 h-6 rounded-full overflow-hidden border-2 border-black absolute"
                   style={{ left: `${index * 12}px`, zIndex: 3 - index }}
                 >
-                  <img className="w-full h-full object-cover" src={user.avatar || dp} alt="" />
+                  <img
+                    className="w-full h-full object-cover"
+                    src={user.avatar || dp}
+                    alt=""
+                  />
                 </div>
               ))}
             </div>
@@ -121,15 +152,21 @@ function Profile() {
 
         <div className="flex flex-col items-center text-white">
           <div className="flex items-center gap-2">
-             <span className="font-bold text-lg">{profileData?.following?.length || 0}</span>
-             <div className="flex relative h-6 w-12">
+            <span className="font-bold text-lg">
+              {profileData?.following?.length || 0}
+            </span>
+            <div className="flex relative h-6 w-12">
               {profileData?.following?.slice(0, 3).map((user, index) => (
                 <div
                   key={index}
                   className="w-6 h-6 rounded-full overflow-hidden border-2 border-black absolute"
                   style={{ left: `${index * 12}px`, zIndex: 3 - index }}
                 >
-                  <img className="w-full h-full object-cover" src={user.avatar || dp} alt="" />
+                  <img
+                    className="w-full h-full object-cover"
+                    src={user.avatar || dp}
+                    alt=""
+                  />
                 </div>
               ))}
             </div>
@@ -149,11 +186,17 @@ function Profile() {
         ) : (
           <>
             <FollowBtn
-              css="bg-violet-600 px-8 py-2 rounded-xl font-bold text-white transition-all active:scale-95"
+              css="bg-violet-600 px-8 py-2 cursor-pointer rounded-xl font-bold text-white transition-all active:scale-95"
               targetedUserId={profileData?._id}
               onFollowChange={handleProfile}
             />
-            <button className="bg-zinc-800 px-8 py-2 rounded-xl font-bold text-white">
+            <button
+              className="bg-zinc-800 px-8 py-2 rounded-xl font-bold text-white cursor-pointer"
+              onClick={() => {
+                dispatch(setSelectedUser(profileData));
+                navigate("/messageField");
+              }}
+            >
               Message
             </button>
           </>
@@ -169,7 +212,9 @@ function Profile() {
               <div
                 key={type}
                 className={`${
-                  showPosts === type ? "bg-white text-black shadow-sm" : "text-zinc-500"
+                  showPosts === type
+                    ? "bg-white text-black shadow-sm"
+                    : "text-zinc-500"
                 } flex-1 flex justify-center items-center font-bold rounded-full cursor-pointer transition-all duration-200 capitalize text-sm`}
                 onClick={() => setShowPosts(type)}
               >
@@ -185,7 +230,9 @@ function Profile() {
           ) : (
             <div className="py-20 text-center">
               <p className="text-zinc-400 font-medium">
-                {showPosts === "all" ? "No posts shared yet." : "No saved posts yet."}
+                {showPosts === "all"
+                  ? "No posts shared yet."
+                  : "No saved posts yet."}
               </p>
             </div>
           )}
