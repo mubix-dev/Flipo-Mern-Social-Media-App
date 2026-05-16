@@ -29,6 +29,9 @@ function Post({ post }) {
   const [showComments, setShowComments] = useState(false);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [isLiking, setIsLiking] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const updateReduxPost = (updatedPost) => {
     const updatedPosts = postData.map((p) =>
@@ -38,6 +41,8 @@ function Post({ post }) {
   };
 
   const handleLike = async () => {
+    if (isLiking) return; 
+    setIsLiking(true);
     try {
       const result = await axios.post(
         `${serverURL}/api/post/like/${post._id}`,
@@ -47,11 +52,13 @@ function Post({ post }) {
       updateReduxPost(result.data);
     } catch (error) {
       toast.error(error.response?.data?.message || "Error liking post");
+    } finally {
+      setIsLiking(false);
     }
   };
 
   const handleComment = async () => {
-    if (!message.trim()) return toast.error("Comment cannot be empty");
+    if (!message.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
@@ -70,20 +77,30 @@ function Post({ post }) {
   };
 
   const handleSaved = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
     try {
       const result = await axios.get(
         `${serverURL}/api/post/saved/${post._id}`,
         { withCredentials: true },
       );
       dispatch(setUserData(result.data));
+      
       const isSaved = result.data?.saved?.some(
-        (item) => (item._id || item) === post._id,
+        (item) => (item._id || item).toString() === post._id.toString(),
       );
       toast.success(isSaved ? "Post saved!" : "Removed from saved");
     } catch (error) {
       toast.error(error.response?.data?.message || "Error saving post");
+    } finally {
+      setIsSaving(false);
     }
   };
+
+  const hasLiked = post?.likes?.includes(userData?._id);
+  const isPostSaved = userData?.saved?.some(
+    (item) => (item._id || item).toString() === post?._id?.toString()
+  );
 
   return (
     <div className="w-full lg:max-w-[95%] flex flex-col bg-black shadow-lg overflow-hidden rounded-t-2xl text-white mb-0 rounded-b-2xl">
@@ -104,10 +121,15 @@ function Post({ post }) {
             {post.author?.username || "Loading..."}
           </div>
         </div>
-        {userData._id !== post.author._id && <FollowBtn css={"bg-violet-600 hover:bg-violet-700 rounded-lg px-4 py-1.5 text-xs md:text-sm font-semibold transition-all active:scale-95 cursor-pointer"} targetedUserId={post.author?._id} />} 
+        {userData?._id !== post?.author?._id && (
+          <FollowBtn 
+            css={"bg-violet-600 hover:bg-violet-700 rounded-lg px-4 py-1.5 text-xs md:text-sm font-semibold transition-all active:scale-95 cursor-pointer"} 
+            targetedUserId={post?.author?._id} 
+          />
+        )} 
       </div>
 
-      <div className="w-full bg-zinc-900 flex items-center justify-center">
+      <div className="w-full bg-zinc-900 flex items-center justify-center relative">
         {post.mediaType === "image" ? (
           <img
             className="w-full h-auto max-h-[75vh] object-contain"
@@ -116,7 +138,7 @@ function Post({ post }) {
           />
         ) : (
           <div className="w-full h-auto">
-            <VideoPlayer media={post.media} />
+            <VideoPlayer media={post.media} isLoop={true} />
           </div>
         )}
       </div>
@@ -124,16 +146,15 @@ function Post({ post }) {
       <div className="p-4 w-full flex flex-col gap-2">
         <div className="w-full flex justify-between items-center">
           <div className="flex gap-4">
-            <div className="flex items-center gap-1">
-              {/* Optional chaining added for userData safety */}
-              {post.likes.includes(userData?._id) ? (
+            <div className={`flex items-center gap-1 transition-opacity ${isLiking ? "opacity-50" : "opacity-100"}`}>
+              {hasLiked ? (
                 <FaHeart
-                  className="text-red-500 text-xl cursor-pointer"
+                  className="text-red-500 text-xl cursor-pointer active:scale-90 transition-transform"
                   onClick={handleLike}
                 />
               ) : (
                 <FaRegHeart
-                  className="text-xl cursor-pointer"
+                  className="text-xl cursor-pointer active:scale-90 transition-transform"
                   onClick={handleLike}
                 />
               )}
@@ -141,25 +162,27 @@ function Post({ post }) {
             </div>
             <div className="flex items-center gap-1">
               <FaRegCommentAlt
-                className="text-lg cursor-pointer"
+                className="text-lg cursor-pointer active:scale-90 transition-transform"
                 onClick={() => setShowComments(!showComments)}
               />
               <span className="text-sm font-medium">
-                {post.comments.length}
+                {post.comments?.length || 0}
               </span>
             </div>
           </div>
-          {!userData?.saved?.some((item) => (item._id || item) === post._id) ? (
-            <FaRegBookmark
-              className="text-xl cursor-pointer hover:text-zinc-400 transition-colors"
-              onClick={handleSaved}
-            />
-          ) : (
-            <FaBookmark
-              className="text-xl cursor-pointer text-white"
-              onClick={handleSaved}
-            />
-          )}
+          <div className={`transition-opacity ${isSaving ? "opacity-50" : "opacity-100"}`}>
+            {!isPostSaved ? (
+              <FaRegBookmark
+                className="text-xl cursor-pointer hover:text-zinc-400 transition-colors"
+                onClick={handleSaved}
+              />
+            ) : (
+              <FaBookmark
+                className="text-xl cursor-pointer text-white"
+                onClick={handleSaved}
+              />
+            )}
+          </div>
         </div>
 
         <p className="text-sm">
@@ -170,7 +193,7 @@ function Post({ post }) {
 
       {showComments && (
         <div className="w-full px-4 pb-4 bg-zinc-950 border-t border-zinc-900 animate-in fade-in slide-in-from-top-2">
-          <div className="max-h-60 overflow-y-auto mt-2 mb-2 space-y-2 ">
+          <div className="max-h-60 overflow-y-auto mt-2 mb-2 space-y-2 no-scrollbar">
             {post.comments?.map((com) => (
               <div className="flex gap-2 items-start" key={com._id}>
                 <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-zinc-800 mt-1">
@@ -182,9 +205,9 @@ function Post({ post }) {
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-[10px] font-bold text-zinc-500 mb-0.5 px-1">
-                    {com.author?.username}
+                    {com.author?.username || "user"}
                   </span>
-                  <div className="bg-zinc-900 px-3 py-1 rounded-2xl rounded-tl-none text-sm text-zinc-200 wrap-break-word">
+                  <div className="bg-zinc-900 px-3 py-1 rounded-2xl rounded-tl-none text-sm text-zinc-200 wrap-break-word max-w-full">
                     {com.message}
                   </div>
                 </div>
@@ -192,7 +215,7 @@ function Post({ post }) {
             ))}
           </div>
 
-          <div className="flex items-center gap-3 border-t border-zinc-800 pt-3">
+          <div className="flex items-center gap-3 border-t border-zinc-800 pt-3 relative">
             <div className="w-8 h-8 rounded-full overflow-hidden border border-zinc-700 shrink-0">
               <img
                 className="w-full h-full object-cover"
@@ -202,18 +225,19 @@ function Post({ post }) {
             </div>
             <input
               type="text"
-              placeholder="Add a comment..."
-              className="flex-1 bg-transparent py-1 text-sm outline-none border-b border-transparent focus:border-violet-500 transition-colors"
+              disabled={isSubmitting}
+              placeholder={isSubmitting ? "Posting comment..." : "Add a comment..."}
+              className="flex-1 bg-transparent py-1 text-sm outline-none border-b border-transparent focus:border-violet-500 transition-colors disabled:opacity-50"
               onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleComment()}
+              onKeyDown={(e) => e.key === "Enter" && !isSubmitting && handleComment()}
               value={message}
             />
             <button
               disabled={isSubmitting || !message.trim()}
               onClick={handleComment}
-              className="disabled:opacity-30 transition-opacity cursor-pointer"
+              className="disabled:opacity-30 transition-opacity cursor-pointer p-1"
             >
-              <IoMdSend className="text-violet-500 text-2xl" />
+              <IoMdSend className={`text-2xl transition-colors ${isSubmitting ? "text-zinc-500 animate-pulse" : "text-violet-500"}`} />
             </button>
           </div>
         </div>
