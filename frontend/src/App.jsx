@@ -16,6 +16,8 @@ import getAllFlips from "./hooks/getALLFlips";
 import FlipsPage from "./pages/FlipsPage";
 import StoryPage from "./pages/StoryPage";
 import getAllStories from "./hooks/getALLStories";
+import ChatPage from "./pages/ChatPage";
+import MessagesField from "./pages/MessagesField";
 function App() {
   getCurrentUser();
   const { userData } = useSelector((state) => state.user);
@@ -62,6 +64,14 @@ function App() {
         <Route
           path="/story/:username"
           element={userData ? <StoryPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/chats"
+          element={userData ? <ChatPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/messageField"
+          element={userData ? <MessagesField /> : <Navigate to={"/login"} />}
         />
         
       </Routes>
