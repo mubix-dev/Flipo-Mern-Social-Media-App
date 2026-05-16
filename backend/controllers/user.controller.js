@@ -172,4 +172,16 @@ const follow = async (req, res) => {
   }
 };
 
-export { getCurrentUser, getSuggestedUsers, editProfile, getProfile, follow };
+const getFollowingList = async(req,res)=>{
+  try {
+    const user = await User.findById(req.userId).populate("following","avatar username name")
+    if(!user){
+      return res.status(404).json({message:"User not found"})
+    }
+    return res.status(200).json(user.following)
+  } catch (error) {
+    return res.status(500).json({message:`getFollowingList error: ${error}`})
+  }
+}
+
+export { getCurrentUser, getSuggestedUsers, editProfile, getProfile, follow,getFollowingList };
