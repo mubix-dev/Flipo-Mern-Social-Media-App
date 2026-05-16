@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPostData } from "../redux/postSlice";
 import { setStoryData } from "../redux/storySlice";
 import { setFlipData } from "../redux/flipSlice";
+import { setUserData } from "../redux/userSlice";
 
 function Upload() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ function Upload() {
   const {postData} = useSelector(state=>state.post);
   const {storyData} = useSelector(state=>state.story);
   const {flipData} = useSelector(state=>state.flip);
+  const {userData} = useSelector(state=>state.user);
 
   const dispatch = useDispatch();
 
@@ -75,7 +77,8 @@ function Upload() {
         formData.append("mediaType",mediaType);
         formData.append("media",backendMedia)
         const result = await axios.post(`${serverURL}/api/story/upload`,formData,{withCredentials:true});
-        dispatch(setStoryData(result.data));
+        const updatedUser = { ...userData, story: result.data };
+        dispatch(setUserData(updatedUser));
         setLoading(false)
         navigate("/")
         
