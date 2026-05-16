@@ -6,6 +6,8 @@ import Nav from "./Nav";
 import { useSelector } from "react-redux";
 import Post from "./Post";
 import { ClipLoader } from "react-spinners";
+import { TbMessage2 } from "react-icons/tb";
+import { useNavigate } from "react-router-dom";
 
 function Feed() {
   const { postData } = useSelector((state) => state.post);
@@ -20,13 +22,16 @@ function Feed() {
     );
   }
 
+  const navigate = useNavigate()
+
   return (
     <div className="w-full lg:w-[50%] h-screen relative overflow-y-auto bg-black no-scrollbar flex flex-col">
       
       <div className="w-full h-25 lg:hidden flex justify-between items-center p-2.5 shrink-0">
         <img className="w-25" src={logo} alt="Logo" />
-        <div>
+        <div className="flex items-center gap-2.5">
           <FiHeart className="text-white w-5 h-5 cursor-pointer active:scale-90 transition-transform" />
+          <TbMessage2 className="text-white w-5 h-5 cursor-pointer active:scale-90 transition-transform" onClick={()=>navigate("/chats")} />
         </div>
       </div>
 
