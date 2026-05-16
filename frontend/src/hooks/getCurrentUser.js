@@ -1,26 +1,29 @@
-import axios from "axios"
-import { useEffect } from "react"
-import { serverURL } from "../main"
-import { useDispatch, useSelector } from "react-redux"
-import { setUserData } from "../redux/userSlice"
+import axios from "axios";
+import { useEffect } from "react";
+import { serverURL } from "../main";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../redux/userSlice";
 
+const getCurrentUser = () => {
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
 
-const getCurrentUser = ()=>{
-    const dispatch = useDispatch();
-    const {userData} = useSelector(state=>state.user)
-    useEffect(()=>{
-        const fetchCurrUserData = async ()=>{
-            try {
-                const result = await axios.get(`${serverURL}/api/user/current`,{withCredentials:true});
-                dispatch(setUserData(result.data))
-            } catch (error) {
-                console.log(error)
-            }
-        }
+  useEffect(() => {
+    if (userData) return;
 
-        fetchCurrUserData();
-    },[dispatch])
+    const fetchCurrUserData = async () => {
+      try {
+        const result = await axios.get(`${serverURL}/api/user/current`, {
+          withCredentials: true,
+        });
+        dispatch(setUserData(result.data));
+      } catch (error) {
+        console.log("No active session cookie found.");
+      }
+    };
 
-}
+    fetchCurrUserData();
+  }, [dispatch, userData]);
+};
 
 export default getCurrentUser;
