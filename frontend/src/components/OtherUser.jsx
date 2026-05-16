@@ -19,7 +19,7 @@ function OtherUser({ user }) {
           <div className="text-gray-500 text-[12px] ">{user.name}</div>
         </div>
       </div>
-      <FollowBtn css={"text-white text-[12px] font-medium  cursor-pointer bg-violet-500 hover:bg-violet-600 rounded-md px-2 py-1 "} targetedUserId={user._id}/>
+      <FollowBtn css={"w-18  text-center text-white text-[12px] font-medium  cursor-pointer bg-violet-500 hover:bg-violet-600 rounded-md px-2 py-1 "} targetedUserId={user._id}/>
     </div>
   );
 }
