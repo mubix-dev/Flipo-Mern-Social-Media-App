@@ -9,16 +9,16 @@ import postRouter from "./routes/post.routes.js";
 import flipRouter from "./routes/flip.routes.js";
 import storyRouter from "./routes/story.routes.js";
 import messageRouter from "./routes/message.routes.js";
+import { app, server } from "./socket.js";
 
 dotenv.config({ override: true });
 
-const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-  origin:"http://localhost:5173",
+  origin:process.env.FRONTEND_URL,
   credentials:true
 }))
 
@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
 
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server is running at http://localhost:${PORT}`);
     });
   })
