@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import OnlineUsers from "../components/OnlineUsers";
 import PrevChatUsers from "../components/PrevChatUsers";
+import { ClipLoader } from "react-spinners";
 
 
 function ChatPage() {
@@ -11,6 +12,13 @@ function ChatPage() {
   const { userData, followingList } = useSelector((state) => state.user);
   const { onlineUsers } = useSelector((state) => state.socket);
   const { prevChatUsers } = useSelector((state) => state.message);
+  if (!userData || !onlineUsers || !prevChatUsers) {
+    return (
+      <div className="h-screen w-full bg-black flex items-center justify-center text-white">
+        <ClipLoader color="#870ccf" />
+      </div>
+    );
+  }
   return (
     <div className="w-full min-h-screen flex flex-col ">
       <div
