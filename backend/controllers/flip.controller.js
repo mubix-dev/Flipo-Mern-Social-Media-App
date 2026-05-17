@@ -75,7 +75,10 @@ const likeFlip = async (req, res) => {
 
         const receiverSocketId = getReceiverSocketId(flip.author._id);
         if (receiverSocketId) {
-          io.to(receiverSocketId).emit("newNotification", populatedNotification);
+          io.to(receiverSocketId).emit(
+            "newNotification",
+            populatedNotification,
+          );
         }
       }
     }
@@ -153,4 +156,39 @@ const getAllFlips = async (req, res) => {
   }
 };
 
-export { uploadFlip, likeFlip, commentFlip, getAllFlips };
+const deleteFlip = async (req, res) => {
+  try {
+    const { flipId } = req.params;
+    const currUserId = req.userId;
+
+    const flip = await Flip.findById(flipId);
+    if (!flip) {
+      return res.status(404).json({ message: "Flip not found" });
+    }
+
+    // SECURITY GUARD: Verify ownership
+    if (flip.author.toString() !== currUserId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized! You can only delete your own flips" });
+    }
+
+    // DATABASE SYNCHRONIZATION
+    await Flip.findByIdAndDelete(flipId);
+
+    // PROFILE ARRAY PURGE: Pull reference ID out of user's flips array field
+    await User.findByIdAndUpdate(currUserId, {
+      $pull: { flips: flipId },
+    });
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Flip deleted successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: `deleteFlip error: ${error.message}` });
+  }
+};
+
+export { uploadFlip, likeFlip, commentFlip, getAllFlips, deleteFlip };
