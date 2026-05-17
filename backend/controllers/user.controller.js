@@ -1,12 +1,15 @@
 import User from "../models/user.model.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
+import { getReceiverSocketId, io } from "../socket.js";
+import Notification from "../models/notification.model.js";
 const getCurrentUser = async (req, res) => {
   try {
     const userId = req.userId;
     const user = await User.findById(userId)
       .select(
         "-password -resetPassOtp -resetPassOtpVerified -resetPassOtpExpiry",
-      ).populate("posts flips story")
+      )
+      .populate("posts flips story");
 
     if (!userId) {
       return res.status(400).json({ message: "User not found!" });
@@ -160,6 +163,23 @@ const follow = async (req, res) => {
     } else {
       currUser.following.push(targetedUserId);
       targetedUser.followers.push(currUserId);
+      if (currUser._id != targetedUser._id) {
+        const notification = await Notification.create({
+          sender: currUser._id,
+          receiver: targetedUser._id,
+          type: "follow",
+          message: "started following you",
+        });
+
+        const populatedNotification = await Notification.findById(
+          notification._id,
+        ).populate("sender receiver");
+
+        const receiverSocketId = getReceiverSocketId(targetedUser._id);
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit("newNotification", populatedNotification);
+        }
+      }
       await currUser.save();
       await targetedUser.save();
       return res.status(200).json({
@@ -172,35 +192,86 @@ const follow = async (req, res) => {
   }
 };
 
-const getFollowingList = async(req,res)=>{
+const getFollowingList = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).populate("following","avatar username name")
-    if(!user){
-      return res.status(404).json({message:"User not found"})
+    const user = await User.findById(req.userId).populate(
+      "following",
+      "avatar username name",
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-    return res.status(200).json(user.following)
+    return res.status(200).json(user.following);
   } catch (error) {
-    return res.status(500).json({message:`getFollowingList error: ${error}`})
+    return res
+      .status(500)
+      .json({ message: `getFollowingList error: ${error}` });
   }
-}
+};
 
-const serach = async(req,res)=>{
+const search = async (req, res) => {
   try {
     const keyword = req.query.keyword;
-    if(!keyword){
-      return res.status(400).json({message:"Keyword not found"})
+    if (!keyword) {
+      return res.status(400).json({ message: "Keyword not found" });
     }
     const users = await User.find({
-      $or:[
-        {username:{$regex:keyword,$options:"i"}},
-        {name:{$regex:keyword,$options:"i"}}
-      ]
-    }).select("-password")
+      $or: [
+        { username: { $regex: keyword, $options: "i" } },
+        { name: { $regex: keyword, $options: "i" } },
+      ],
+    }).select("-password");
 
-    return res.status(200).json(users)
+    return res.status(200).json(users);
   } catch (error) {
-    
+    return res.status(500).json({message:`search error${error}`})
+  }
+};
+
+const getAllNotifications = async(req,res)=>{
+  try {
+    const notifications = await Notification.find({
+      receiver:req.userId
+    }).populate("sender receiver post flip").sort({createdAt:-1})
+    if(!notifications){
+      return res.status(400).json({message:"Nontifications not found"})
+    }
+
+    return res.status(200).json(notifications)
+
+  } catch (error) {
+    return res.status(500).json({message:`getAllNotifications error${error}`})
   }
 }
 
-export { getCurrentUser, getSuggestedUsers, editProfile, getProfile, follow,getFollowingList,serach };
+const markAsRead = async(req,res)=>{
+  try {
+    const {notificationId} = req.body
+    if(Array.isArray(notificationId)){
+      await Notification.updateMany(
+        {_id:{$in:notificationId},receiver:req.userId},
+        {$set:{isRead:true}}
+      )
+    }else{
+      await Notification.findByIdAndUpdate(
+        {_id:{$in:notificationId},receiver:req.userId},
+        {$set:{isRead:true}}
+      )
+    }
+    return res.status(200).json({message:"Mark as read"})
+  } catch (error) {
+    return res.status(500).json({message:`markAsRead error${error}`})
+  }
+}
+
+export {
+  getCurrentUser,
+  getSuggestedUsers,
+  editProfile,
+  getProfile,
+  follow,
+  getFollowingList,
+  search,
+  getAllNotifications,
+  markAsRead
+};
