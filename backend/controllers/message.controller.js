@@ -1,6 +1,7 @@
 import uploadOnCloudinary from "../config/cloudinary.js"
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import { getReceiverSocketId, io } from "../socket.js";
 const sendMessage = async(req,res)=>{
     try {
         const senderId = req.userId;
@@ -31,6 +32,10 @@ const sendMessage = async(req,res)=>{
             conversation.messages.push(newMessage._id)
             await conversation.save();
         }
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if(receiverSocketId){
+            io.to(receiverSocketId).emit("newMessage",newMessage);
+        }
         return res.status(200).json(newMessage);
     } catch (error) {
         return res.status(500).json({message:`sendMessage error: ${error}`})
@@ -57,7 +62,7 @@ const getPrevUserChats = async(req,res)=>{
 
         const conversations = await Conversation.find({
             participants:currUserId
-        }).populate("participants").sort({updatedAt:-1});
+        }).populate("participants","name username avatar").sort({updatedAt:-1});
 
         const userMap = {};
 
