@@ -5,15 +5,8 @@ import { useNavigate } from "react-router-dom";
 import Flip from "../components/Flip";
 import { ClipLoader } from "react-spinners";
 function FlipsPage() {
-    const navigate = useNavigate();
-    const {flipData} = useSelector(state=>state.flip)
-    if (!flipData) {
-    return (
-      <div className="h-screen w-full bg-black flex items-center justify-center text-white">
-        <ClipLoader color="#870ccf" />
-      </div>
-    );
-  }
+  const navigate = useNavigate();
+  const { flipData } = useSelector((state) => state.flip);
   return (
     <div className="w-full min-h-screen bg-black flex items-center gap-5 flex-col">
       <div
@@ -25,13 +18,15 @@ function FlipsPage() {
       </div>
       <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory flex  items-center flex-col">
         {Array.isArray(flipData) ? (
-            flipData.map((flip) => (
-                <div key={flip._id} className="h-screen snap-start">
-                    <Flip flip={flip} />
-                </div>
-            ))
+          flipData.map((flip) => (
+            <div key={flip._id} className="h-screen snap-start">
+              <Flip flip={flip} />
+            </div>
+          ))
         ) : (
-            <div className="text-white">Loading flips...</div>
+          <div className="h-screen w-full bg-black flex items-center justify-center text-white">
+            <ClipLoader color="#870ccf" />
+          </div>
         )}
       </div>
     </div>
