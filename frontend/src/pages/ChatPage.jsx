@@ -12,7 +12,7 @@ function ChatPage() {
   const { userData, followingList } = useSelector((state) => state.user);
   const { onlineUsers } = useSelector((state) => state.socket);
   const { prevChatUsers } = useSelector((state) => state.message);
-  if (!userData || !onlineUsers || !prevChatUsers) {
+  if (!userData) {
     return (
       <div className="h-screen w-full bg-black flex items-center justify-center text-white">
         <ClipLoader color="#870ccf" />
