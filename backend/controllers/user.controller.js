@@ -184,4 +184,23 @@ const getFollowingList = async(req,res)=>{
   }
 }
 
-export { getCurrentUser, getSuggestedUsers, editProfile, getProfile, follow,getFollowingList };
+const serach = async(req,res)=>{
+  try {
+    const keyword = req.query.keyword;
+    if(!keyword){
+      return res.status(400).json({message:"Keyword not found"})
+    }
+    const users = await User.find({
+      $or:[
+        {username:{$regex:keyword,$options:"i"}},
+        {name:{$regex:keyword,$options:"i"}}
+      ]
+    }).select("-password")
+
+    return res.status(200).json(users)
+  } catch (error) {
+    
+  }
+}
+
+export { getCurrentUser, getSuggestedUsers, editProfile, getProfile, follow,getFollowingList,serach };
