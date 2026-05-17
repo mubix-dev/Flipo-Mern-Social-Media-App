@@ -147,7 +147,7 @@ function Flip({ flip }) {
   }, [socket, flipData, dispatch]);
 
   return (
-    <div className="w-full lg:w-100 h-screen snap-center flex justify-center items-center border-l border-r border-zinc-800 bg-black relative overflow-hidden">
+    <div className="w-full md:w-100 h-screen snap-center flex justify-center items-center border-l border-r border-zinc-800 bg-black relative overflow-hidden">
       <video
         ref={videoRef}
         loop
