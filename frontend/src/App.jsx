@@ -22,6 +22,8 @@ import io from "socket.io-client";
 import { serverURL } from "./main";
 import { setOnlineUsers, setSocket } from "./redux/socketSlice";
 import getFollowing from "./hooks/getFollowing";
+import getPrevChatUsers from "./hooks/getPrevChatUsers";
+import Search from "./pages/Search";
 function App() {
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.user);
@@ -49,6 +51,7 @@ function App() {
   getAllFlips();
   getAllStories();
   getFollowing();
+  getPrevChatUsers();
   return (
     <div>
       <Toaster position="top-center" reverseOrder={false} />
@@ -96,6 +99,10 @@ function App() {
         <Route
           path="/messageField"
           element={userData ? <MessagesField /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/search"
+          element={userData ? <Search /> : <Navigate to={"/login"} />}
         />
       </Routes>
     </div>
