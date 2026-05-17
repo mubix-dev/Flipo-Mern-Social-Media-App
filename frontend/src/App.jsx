@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
@@ -27,10 +27,31 @@ import Search from "./pages/Search";
 import getAllNotifications from "./hooks/getAllNotifiactions";
 import NotificationsPage from "./pages/NotificationsPage";
 import { setNotificationsData } from "./redux/userSlice";
+import { PacmanLoader } from "react-spinners"
 function App() {
   const dispatch = useDispatch();
   const { userData, notificationsData } = useSelector((state) => state.user);
   const { socket } = useSelector((state) => state.socket);
+  const [isBackendReady, setIsBackendReady] = useState(false)
+
+  useEffect(() => {
+    const wakeUpServerAndCheckAuth = async () => {
+      try {
+        await axios
+          .get(`${serverURL}/api/auth/health-check`, { withCredentials: true })
+          .catch(() => {});
+      } catch (err) {
+        console.log("Server waking up...");
+      } finally {
+        setTimeout(()=>{
+          setIsBackendReady(true);
+        },3000)
+      }
+    };
+
+    wakeUpServerAndCheckAuth();
+  }, []);
+
   useEffect(() => {
     if (userData?._id) {
       const socketIo = io(serverURL, {
@@ -60,6 +81,17 @@ function App() {
   getFollowing();
   getPrevChatUsers();
   getAllNotifications();
+
+  if (!isBackendReady) {
+    return (
+      <div className="w-full min-h-screen bg-black flex flex-col items-center justify-center gap-4">
+        <PacmanLoader className="mr-15" color="#9333ea" size={30}  />
+        <p className="text-zinc-500 text-xs mt-2 tracking-wide">
+          Waking up secure servers... please wait
+        </p>
+      </div>
+    );
+  }
   return (
     <div>
       <Toaster position="top-center" reverseOrder={false} />
