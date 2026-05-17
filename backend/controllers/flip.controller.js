@@ -1,7 +1,8 @@
 import Flip from "../models/flip.model.js";
 import User from "../models/user.model.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
-import { io } from "../socket.js";
+import { getReceiverSocketId, io } from "../socket.js";
+import Notification from "../models/notification.model.js";
 
 const uploadFlip = async (req, res) => {
   try {
@@ -59,16 +60,34 @@ const likeFlip = async (req, res) => {
       );
     } else {
       flip.likes.push(req.userId);
+      if (flip.author._id != req.userId) {
+        const notification = await Notification.create({
+          sender: req.userId,
+          receiver: flip.author._id,
+          type: "like",
+          message: "like your flip",
+          flip: flip._id,
+        });
+
+        const populatedNotification = await Notification.findById(
+          notification._id,
+        ).populate("sender receiver flip");
+
+        const receiverSocketId = getReceiverSocketId(flip.author._id);
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit("newNotification", populatedNotification);
+        }
+      }
     }
 
     await flip.save();
 
     await flip.populate("author", "name username avatar");
 
-    io.emit("likeFlip",{
+    io.emit("likeFlip", {
       flipId: flip._id,
-      likes:flip.likes
-    })
+      likes: flip.likes,
+    });
     return res.status(200).json(flip);
   } catch (error) {
     return res.status(500).json({ message: `likeFlip error : ${error}` });
@@ -89,14 +108,33 @@ const commentFlip = async (req, res) => {
       message,
     });
 
+    if (flip.author._id != req.userId) {
+      const notification = await Notification.create({
+        sender: req.userId,
+        receiver: flip.author._id,
+        type: "comment",
+        message: "comment on your flip",
+        flip: flip._id,
+      });
+
+      const populatedNotification = await Notification.findById(
+        notification._id,
+      ).populate("sender receiver flip");
+
+      const receiverSocketId = getReceiverSocketId(flip.author._id);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("newNotification", populatedNotification);
+      }
+    }
+
     await flip.save();
 
     await flip.populate("author", "name username avatar");
     await flip.populate("comments.author");
-    io.emit("commentOnFlip",{
+    io.emit("commentOnFlip", {
       flipId: flip._id,
-      comments:flip.comments
-    })
+      comments: flip.comments,
+    });
 
     return res.status(200).json(flip);
   } catch (error) {
@@ -106,14 +144,13 @@ const commentFlip = async (req, res) => {
 
 const getAllFlips = async (req, res) => {
   try {
-    const flips = await Flip.find({}).populate(
-      "author",
-      "name username avatar",
-    ).populate("comments.author")
+    const flips = await Flip.find({})
+      .populate("author", "name username avatar")
+      .populate("comments.author");
     return res.status(200).json(flips);
   } catch (error) {
     return res.status(500).json({ message: `getAllFlips error: ${error}` });
   }
 };
 
-export {uploadFlip,likeFlip,commentFlip,getAllFlips};
+export { uploadFlip, likeFlip, commentFlip, getAllFlips };
