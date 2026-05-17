@@ -43,9 +43,7 @@ function App() {
       } catch (err) {
         console.log("Server waking up...");
       } finally {
-        setTimeout(()=>{
           setIsBackendReady(true);
-        },3000)
       }
     };
 
