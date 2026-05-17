@@ -28,6 +28,7 @@ function MessagesField() {
 
   const { selectedUser, messages } = useSelector((state) => state.message);
   const { userData } = useSelector((state) => state.user);
+  const { socket } = useSelector((state) => state.socket);
 
   const getAllMessages = async () => {
     if (!selectedUser?._id) return;
@@ -47,6 +48,13 @@ function MessagesField() {
     getAllMessages();
   }, [selectedUser?._id]);
 
+  useEffect(()=>{
+    socket?.on("newMessage",(msg)=>{
+      dispatch(setMessages([...messages,msg]))
+    })
+    return ()=>socket?.off("newMessage")
+  },[messages,setMessages])
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
@@ -60,6 +68,7 @@ function MessagesField() {
       setFrontEndImage(URL.createObjectURL(file));
     }
   };
+
 
   const clearImageField = () => {
     setBackendImage(null);
