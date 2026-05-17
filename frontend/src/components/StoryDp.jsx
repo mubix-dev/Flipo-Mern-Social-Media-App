@@ -58,8 +58,8 @@ function StoryDp({ username, avatar, story }) {
       <div
         className={`w-18 h-18 flex items-center justify-center rounded-full p-0.5 transition-all duration-300
         ${
-          story && !isViewed
-            ? "bg-linear-to-tr from-blue-500 via-pink-500 to-purple-900"
+          !isViewed
+            ? story ? "bg-linear-to-tr from-blue-500 via-pink-500 to-purple-900":""
             : "border-2 border-zinc-800"
         }`}
       >
