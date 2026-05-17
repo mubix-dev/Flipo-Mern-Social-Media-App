@@ -27,7 +27,7 @@ function ChatPage() {
         ))}
       </div>
       <div className="text-[14px] lg:text-[18px] mt-5 text-slate-400 px-5 font-semibold">{onlineUsers?.length>1?"Recent Chats":""}</div>
-      <div className="w-full  flex flex-col py-2.5  gap-2.5 overflow-y-scroll">
+      <div className="w-full  flex flex-col py-2.5 items-center  gap-2.5 overflow-y-scroll">
         {prevChatUsers?.map((user) => (
           <PrevChatUsers key={user._id} user={user} />
         ))}

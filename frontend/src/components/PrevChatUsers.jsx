@@ -14,17 +14,17 @@ function PrevChatUsers({ user }) {
   const isOnline = onlineUsers?.includes(user?._id?.toString());
 
   return (
-    <div className="w-full flex justify-between items-center px-5 ">
+    <div className="w-[90%] flex p-2.5 bg-zinc-900/50  rounded-2xl cursor-pointer " onClick={() => {
+              dispatch(setSelectedUser(user));
+              navigate("/messageField");
+            }}>
       <div className="flex justify-center items-center gap-2.5">
         
         <div className="relative w-12 h-12">
           
           <div
             className="w-full h-full rounded-full cursor-pointer overflow-hidden border border-zinc-800"
-            onClick={() => {
-              dispatch(setSelectedUser(user));
-              navigate("/messageField");
-            }}
+            
           >
             <img
               className="w-full h-full object-cover aspect-square"

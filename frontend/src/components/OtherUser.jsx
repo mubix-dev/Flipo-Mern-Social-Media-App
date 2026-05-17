@@ -7,7 +7,7 @@ function OtherUser({ user }) {
   const navigate = useNavigate()
   
   return (
-    <div className="w-full flex  justify-between items-center px-5 ">
+    <div className="w-[90%] flex  justify-between items-center p-2.5 bg-zinc-900/50 rounded-2xl">
       <div className="flex justify-center items-center gap-2.5">
         <div className="w-12 h-12 border-black border-2 rounded-full cursor-pointer overflow-hidden" onClick={()=>navigate(`/profile/${user.username}`)}>
           <img className="w-full object-cover aspect-square" src={user.avatar || dp} alt="" />
