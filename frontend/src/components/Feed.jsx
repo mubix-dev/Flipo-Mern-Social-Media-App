@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 function Feed() {
   const { postData } = useSelector((state) => state.post);
-  const { userData } = useSelector((state) => state.user);
+  const { userData,notificationsData } = useSelector((state) => state.user);
   const { allStoriesData } = useSelector((state) => state.story);
 
   if (!userData || !postData || !allStoriesData) {
@@ -29,8 +29,11 @@ function Feed() {
       
       <div className="w-full h-25 lg:hidden flex justify-between items-center p-2.5 shrink-0">
         <img className="w-25" src={logo} alt="Logo" />
-        <div className="flex items-center gap-2.5">
-          <FiHeart className="text-white w-5 h-5 cursor-pointer active:scale-90 transition-transform" />
+        <div className="flex items-center gap-2.5  ">
+          <div className="relative cursor-pointer"onClick={()=>navigate("/notifications")}>
+            <FiHeart className="text-white   w-5 h-5  cursor-pointer active:scale-90 transition-transform" />
+          {notificationsData?.length > 0 && notificationsData?.some(n=>n.isRead === false) && <div className="w-2 h-2 bg-purple-500 rounded-full absolute -top-0.5 -right-0.5"></div>}
+          </div>
           <TbMessage2 className="text-white w-5 h-5 cursor-pointer active:scale-90 transition-transform" onClick={()=>navigate("/chats")} />
         </div>
       </div>
@@ -54,7 +57,7 @@ function Feed() {
       </div>
 
       
-      <div className="w-full flex-1 flex flex-col items-center gap-3 p-5 pt-10 bg-slate-100 rounded-t-[50px] relative">
+      <div className="w-full flex-1 flex flex-col items-center gap-2 p-2  pt-10 bg-slate-100 rounded-t-[50px] relative">
         <Nav />
         
         {postData?.length > 0 ? (
