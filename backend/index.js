@@ -32,6 +32,9 @@ app.use("/api/message",messageRouter)
 app.get("/", (req, res) => {
   res.send("Server is running!");
 });
+app.get("/api/auth/health-check", (req, res) => {
+  return res.status(200).json({ status: "active", message: "Server is fully responsive." });
+});
 
 connectDB()
   .then(() => {
