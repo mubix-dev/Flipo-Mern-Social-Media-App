@@ -20,7 +20,7 @@ function Nav() {
       <div onClick={()=>navigate("/upload")}>
         <FaRegPlusSquare className="text-white text-[25px] cursor-pointer"/>
       </div>
-      <div>
+      <div onClick={()=>navigate("/search")}>
         <IoSearch className="text-white text-[25px] cursor-pointer"/>
       </div>
 
