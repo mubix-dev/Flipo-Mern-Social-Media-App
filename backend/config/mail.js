@@ -22,6 +22,8 @@ const sendEmail = async (options) => {
       pass: process.env.EMAIL_PASS,
                         
     },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
   });
 
   const mail = {
