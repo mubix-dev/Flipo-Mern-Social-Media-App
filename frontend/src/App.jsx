@@ -24,9 +24,12 @@ import { setOnlineUsers, setSocket } from "./redux/socketSlice";
 import getFollowing from "./hooks/getFollowing";
 import getPrevChatUsers from "./hooks/getPrevChatUsers";
 import Search from "./pages/Search";
+import getAllNotifications from "./hooks/getAllNotifiactions";
+import NotificationsPage from "./pages/NotificationsPage";
+import { setNotificationsData } from "./redux/userSlice";
 function App() {
   const dispatch = useDispatch();
-  const { userData } = useSelector((state) => state.user);
+  const { userData, notificationsData } = useSelector((state) => state.user);
   const { socket } = useSelector((state) => state.socket);
   useEffect(() => {
     if (userData?._id) {
@@ -37,14 +40,18 @@ function App() {
       socketIo.on("getOnlineUsers", (user) => {
         dispatch(setOnlineUsers(user));
       });
-      return ()=>socketIo.close();
+      return () => socketIo.close();
     } else {
       if (socket) {
         socket.close();
         dispatch(setSocket(null));
       }
     }
-  }, [userData,dispatch]);
+  }, [userData, dispatch]);
+
+  socket?.on("newNotification", (notification) => {
+    dispatch(setNotificationsData([...notificationsData, notification]));
+  });
   getCurrentUser();
   getSuggestedUsers();
   getAllPosts();
@@ -52,6 +59,7 @@ function App() {
   getAllStories();
   getFollowing();
   getPrevChatUsers();
+  getAllNotifications();
   return (
     <div>
       <Toaster position="top-center" reverseOrder={false} />
@@ -103,6 +111,12 @@ function App() {
         <Route
           path="/search"
           element={userData ? <Search /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/notifications"
+          element={
+            userData ? <NotificationsPage /> : <Navigate to={"/login"} />
+          }
         />
       </Routes>
     </div>
