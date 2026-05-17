@@ -1,10 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  FaHeart,
-  FaRegHeart,
-  FaComment,
-  FaTimes,
-} from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaComment, FaTimes } from "react-icons/fa";
 import { FaPlay } from "react-icons/fa6";
 import { IoMdSend } from "react-icons/io";
 import { VscMute, VscUnmute } from "react-icons/vsc";
@@ -34,6 +29,7 @@ function Flip({ flip }) {
 
   const { userData } = useSelector((state) => state.user);
   const { flipData } = useSelector((state) => state.flip);
+  const { socket } = useSelector((state) => state.socket);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -111,8 +107,6 @@ function Flip({ flip }) {
     }
   };
 
-  
-
   const handleFlipComment = async (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
@@ -132,6 +126,26 @@ function Flip({ flip }) {
     }
   };
 
+  useEffect(() => {
+    socket.on("likeFlip", (updatedFlip) => {
+      const updatedFlips = flipData.map((p) =>
+        p._id == updatedFlip.flipId ? { ...p, likes: updatedFlip.likes } : p,
+      );
+      dispatch(setFlipData(updatedFlips));
+    });
+    socket.on("commentOnFlip", (updatedFlip) => {
+      const updatedFlips = flipData.map((p) =>
+        p._id == updatedFlip.flipId
+          ? { ...p, comments: updatedFlip.comments }
+          : p,
+      );
+      dispatch(setFlipData(updatedFlips));
+    });
+
+    return () => socket.off("likeFlip");
+    socket.off("commentOnFlip");
+  }, [socket, flipData, dispatch]);
+
   return (
     <div className="w-full lg:w-100 h-screen snap-center flex justify-center items-center border-l border-r border-zinc-800 bg-black relative overflow-hidden">
       <video
@@ -146,7 +160,6 @@ function Flip({ flip }) {
         onClick={togglePlay}
       />
 
-
       {showHeartAnim && (
         <div className="absolute flex items-center justify-center pointer-events-none z-40">
           <FaHeart className="text-red-500 text-9xl animate-ping opacity-80" />
@@ -157,7 +170,6 @@ function Flip({ flip }) {
           <FaPlay className="text-white text-6xl opacity-20" />
         </div>
       )}
-
 
       <div
         className="absolute top-5 right-5 z-20 bg-black/40 p-2 rounded-full text-white cursor-pointer"
@@ -270,7 +282,6 @@ function Flip({ flip }) {
               </div>
             )}
           </div>
-          
 
           <form
             onSubmit={handleFlipComment}
@@ -297,7 +308,6 @@ function Flip({ flip }) {
             </button>
           </form>
         </div>
-        
       </div>
     </div>
   );
