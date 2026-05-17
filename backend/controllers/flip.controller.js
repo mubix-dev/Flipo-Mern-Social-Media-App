@@ -149,7 +149,7 @@ const getAllFlips = async (req, res) => {
   try {
     const flips = await Flip.find({})
       .populate("author", "name username avatar")
-      .populate("comments.author");
+      .populate("comments.author").sort({createdAt:-1});
     return res.status(200).json(flips);
   } catch (error) {
     return res.status(500).json({ message: `getAllFlips error: ${error}` });
