@@ -51,8 +51,8 @@ const signup = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      secure: false,
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "None",
     });
 
     const createdUser = await User.findById(user._id).select(
@@ -89,8 +89,8 @@ const login = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      secure: false,
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "None",
     });
     const loginedUser = await User.findById(user._id).select(
       "-password -resetPassOtp -resetPassOtpVerified -resetPassOtpExpiry",
