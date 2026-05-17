@@ -3,9 +3,17 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Flip from "../components/Flip";
+import { ClipLoader } from "react-spinners";
 function FlipsPage() {
     const navigate = useNavigate();
     const {flipData} = useSelector(state=>state.flip)
+    if (!flipData) {
+    return (
+      <div className="h-screen w-full bg-black flex items-center justify-center text-white">
+        <ClipLoader color="#870ccf" />
+      </div>
+    );
+  }
   return (
     <div className="w-full min-h-screen bg-black flex items-center gap-5 flex-col">
       <div
