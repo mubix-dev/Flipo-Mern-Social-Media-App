@@ -9,6 +9,7 @@ import {
   FaHeart,
   FaBookmark,
 } from "react-icons/fa";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 import { IoMdSend } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +19,7 @@ import { setPostData } from "../redux/postSlice";
 import toast from "react-hot-toast";
 import { setUserData } from "../redux/userSlice";
 import FollowBtn from "./FollowBtn";
+import { BeatLoader } from "react-spinners";
 
 function Post({ post }) {
   const navigate = useNavigate();
@@ -33,6 +35,8 @@ function Post({ post }) {
 
   const [isLiking, setIsLiking] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeletBtn, setShowDeleteBtn] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false); 
 
   const updateReduxPost = (updatedPost) => {
     const updatedPosts = postData.map((p) =>
@@ -98,6 +102,30 @@ function Post({ post }) {
     }
   };
 
+  const handleDeletePost = async () => {
+    if (isDeleting) return;
+    
+    const confirmDelete = window.confirm("Are you sure you want to delete this post?");
+    if (!confirmDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await axios.delete(`${serverURL}/api/post/delete/${post._id}`, {
+        withCredentials: true,
+      });
+      
+      const updatedPosts = postData.filter((p) => p._id !== post._id);
+      dispatch(setPostData(updatedPosts));
+      
+      toast.success("Post deleted successfully");
+      setShowDeleteBtn(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error deleting post");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const hasLiked = post?.likes?.includes(userData?._id);
   const isPostSaved = userData?.saved?.some(
     (item) => (item._id || item).toString() === post?._id?.toString(),
@@ -148,6 +176,20 @@ function Post({ post }) {
             }
             targetedUserId={post?.author?._id}
           />
+        )}
+        {userData?._id === post?.author?._id && (
+          <div className="relative">
+            <BsThreeDotsVertical className=" text-[20px] cursor-pointer" onClick={()=>setShowDeleteBtn(prev=>!prev)} />
+            {showDeletBtn && (
+              <button 
+                disabled={isDeleting}
+                className=" absolute cursor-pointer bg-red-400 -left-18 -top-1 font-semibold py-1 px-2.5 text-white hover:bg-red-500 rounded-lg disabled:opacity-50"
+                onClick={handleDeletePost} 
+              >
+                {isDeleting ? <BeatLoader size={8}/> : "Delete"}
+              </button>
+            )}
+          </div>
         )}
       </div>
 
