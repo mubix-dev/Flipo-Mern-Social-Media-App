@@ -52,7 +52,7 @@ const signup = async (req, res) => {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       secure: true,
-      sameSite: "None",
+      sameSite: "none",
     });
 
     const createdUser = await User.findById(user._id).select(
@@ -90,7 +90,7 @@ const login = async (req, res) => {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       secure: true,
-      sameSite: "None",
+      sameSite: "none",
     });
     const loginedUser = await User.findById(user._id).select(
       "-password -resetPassOtp -resetPassOtpVerified -resetPassOtpExpiry",
