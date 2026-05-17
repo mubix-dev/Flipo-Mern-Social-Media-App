@@ -14,16 +14,13 @@ const sendEmail = async (options) => {
   const emailHtml = mailGenerator.generate(options.mailgenContent);
 
   const transporter = nodemailer.createTransport({
-    host:process.env.SMTP_HOST,
-    port:process.env.SMTP_PORT,
-    secure:false,
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: false,
     auth: {
-      user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASS,
-                        
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
   });
 
   const mail = {
