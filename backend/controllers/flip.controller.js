@@ -1,6 +1,7 @@
 import Flip from "../models/flip.model.js";
 import User from "../models/user.model.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
+import { io } from "../socket.js";
 
 const uploadFlip = async (req, res) => {
   try {
@@ -63,6 +64,11 @@ const likeFlip = async (req, res) => {
     await flip.save();
 
     await flip.populate("author", "name username avatar");
+
+    io.emit("likeFlip",{
+      flipId: flip._id,
+      likes:flip.likes
+    })
     return res.status(200).json(flip);
   } catch (error) {
     return res.status(500).json({ message: `likeFlip error : ${error}` });
@@ -87,6 +93,10 @@ const commentFlip = async (req, res) => {
 
     await flip.populate("author", "name username avatar");
     await flip.populate("comments.author");
+    io.emit("commentOnFlip",{
+      flipId: flip._id,
+      comments:flip.comments
+    })
 
     return res.status(200).json(flip);
   } catch (error) {
