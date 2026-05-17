@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import dp from "../assets/dp.jpg";
 import { useNavigate } from "react-router-dom";
 import VideoPlayer from "./VideoPlayer";
@@ -25,11 +25,12 @@ function Post({ post }) {
 
   const { userData } = useSelector((state) => state.user);
   const { postData } = useSelector((state) => state.post);
+  const { socket } = useSelector((state) => state.socket);
 
   const [showComments, setShowComments] = useState(false);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const [isLiking, setIsLiking] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -41,7 +42,7 @@ function Post({ post }) {
   };
 
   const handleLike = async () => {
-    if (isLiking) return; 
+    if (isLiking) return;
     setIsLiking(true);
     try {
       const result = await axios.post(
@@ -85,7 +86,7 @@ function Post({ post }) {
         { withCredentials: true },
       );
       dispatch(setUserData(result.data));
-      
+
       const isSaved = result.data?.saved?.some(
         (item) => (item._id || item).toString() === post._id.toString(),
       );
@@ -99,8 +100,27 @@ function Post({ post }) {
 
   const hasLiked = post?.likes?.includes(userData?._id);
   const isPostSaved = userData?.saved?.some(
-    (item) => (item._id || item).toString() === post?._id?.toString()
+    (item) => (item._id || item).toString() === post?._id?.toString(),
   );
+  useEffect(() => {
+    socket.on("likePost", (updatedPost) => {
+      const updatedPosts = postData.map((p) =>
+        p._id == updatedPost.postId ? { ...p, likes: updatedPost.likes } : p,
+      );
+      dispatch(setPostData(updatedPosts));
+    });
+    socket.on("commentOnPost", (updatedPost) => {
+      const updatedPosts = postData.map((p) =>
+        p._id == updatedPost.postId
+          ? { ...p, comments: updatedPost.comments }
+          : p,
+      );
+      dispatch(setPostData(updatedPosts));
+    });
+
+    return () => socket.off("likeFlip");
+    socket.off("commentOnPost");
+  }, [socket, postData, dispatch]);
 
   return (
     <div className="w-full lg:max-w-[95%] flex flex-col bg-black shadow-lg overflow-hidden rounded-t-2xl text-white mb-0 rounded-b-2xl">
@@ -122,11 +142,13 @@ function Post({ post }) {
           </div>
         </div>
         {userData?._id !== post?.author?._id && (
-          <FollowBtn 
-            css={"bg-violet-600 hover:bg-violet-700 rounded-lg px-4 py-1.5 text-xs md:text-sm font-semibold transition-all active:scale-95 cursor-pointer"} 
-            targetedUserId={post?.author?._id} 
+          <FollowBtn
+            css={
+              "bg-violet-600 hover:bg-violet-700 rounded-lg px-4 py-1.5 text-xs md:text-sm font-semibold transition-all active:scale-95 cursor-pointer"
+            }
+            targetedUserId={post?.author?._id}
           />
-        )} 
+        )}
       </div>
 
       <div className="w-full bg-zinc-900 flex items-center justify-center relative">
@@ -146,7 +168,9 @@ function Post({ post }) {
       <div className="p-4 w-full flex flex-col gap-2">
         <div className="w-full flex justify-between items-center">
           <div className="flex gap-4">
-            <div className={`flex items-center gap-1 transition-opacity ${isLiking ? "opacity-50" : "opacity-100"}`}>
+            <div
+              className={`flex items-center gap-1 transition-opacity ${isLiking ? "opacity-50" : "opacity-100"}`}
+            >
               {hasLiked ? (
                 <FaHeart
                   className="text-red-500 text-xl cursor-pointer active:scale-90 transition-transform"
@@ -170,7 +194,9 @@ function Post({ post }) {
               </span>
             </div>
           </div>
-          <div className={`transition-opacity ${isSaving ? "opacity-50" : "opacity-100"}`}>
+          <div
+            className={`transition-opacity ${isSaving ? "opacity-50" : "opacity-100"}`}
+          >
             {!isPostSaved ? (
               <FaRegBookmark
                 className="text-xl cursor-pointer hover:text-zinc-400 transition-colors"
@@ -226,10 +252,14 @@ function Post({ post }) {
             <input
               type="text"
               disabled={isSubmitting}
-              placeholder={isSubmitting ? "Posting comment..." : "Add a comment..."}
+              placeholder={
+                isSubmitting ? "Posting comment..." : "Add a comment..."
+              }
               className="flex-1 bg-transparent py-1 text-sm outline-none border-b border-transparent focus:border-violet-500 transition-colors disabled:opacity-50"
               onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !isSubmitting && handleComment()}
+              onKeyDown={(e) =>
+                e.key === "Enter" && !isSubmitting && handleComment()
+              }
               value={message}
             />
             <button
@@ -237,7 +267,9 @@ function Post({ post }) {
               onClick={handleComment}
               className="disabled:opacity-30 transition-opacity cursor-pointer p-1"
             >
-              <IoMdSend className={`text-2xl transition-colors ${isSubmitting ? "text-zinc-500 animate-pulse" : "text-violet-500"}`} />
+              <IoMdSend
+                className={`text-2xl transition-colors ${isSubmitting ? "text-zinc-500 animate-pulse" : "text-violet-500"}`}
+              />
             </button>
           </div>
         </div>
