@@ -11,16 +11,20 @@ const signup = async (req, res) => {
       return res.status(400).json({ message: "Incomplete Information" });
     }
 
-    if(username.length > 20){
-      return res.status(400).json({ message: "Username should be less than 16 characters" });
+    if (username.length > 20) {
+      return res
+        .status(400)
+        .json({ message: "Username should be less than 16 characters" });
     }
-    if(name.length > 20){
-      return res.status(400).json({ message: "Name should be less than 20 characters" });
+    if (name.length > 20) {
+      return res
+        .status(400)
+        .json({ message: "Name should be less than 20 characters" });
     }
-    if(username.length < 3){
+    if (username.length < 3) {
       return res.status(400).json({ message: "Username is too short" });
     }
-    if(name.length < 3){
+    if (name.length < 3) {
       return res.status(400).json({ message: "Name is too short" });
     }
     const existedUser = await User.findOne({
@@ -104,7 +108,11 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    res.clearCookie("token");
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
     return res.status(200).json({ message: "Logout successfully!" });
   } catch (error) {
     return res.status(500).json({ message: `logout error: ${error}` });
@@ -163,27 +171,28 @@ const verifyResetPassOtp = async (req, res) => {
 
     if (isNotExpired && isOtpValid) {
       user.resetPassOtpVerified = true;
-      user.resetPassOtp = ""; 
+      user.resetPassOtp = "";
       await user.save();
-      
-      return res.status(200).json({ 
-        success: true, 
-        message: "OTP verified successfully" 
-      });
-    } 
-    
-    return res.status(400).json({ 
-      message: !isNotExpired ? "OTP has expired!" : "Invalid OTP!" 
-    });
 
+      return res.status(200).json({
+        success: true,
+        message: "OTP verified successfully",
+      });
+    }
+
+    return res.status(400).json({
+      message: !isNotExpired ? "OTP has expired!" : "Invalid OTP!",
+    });
   } catch (error) {
-    return res.status(500).json({ message: `Verify OTP error: ${error.message}` });
+    return res
+      .status(500)
+      .json({ message: `Verify OTP error: ${error.message}` });
   }
 };
 
 const resetForgotPassword = async (req, res) => {
   try {
-    const { email,newPassword,confirmPass } = req.body;
+    const { email, newPassword, confirmPass } = req.body;
     if (!email) {
       return res.status(400).json({ message: "Please enter your email" });
     }
@@ -191,24 +200,34 @@ const resetForgotPassword = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) return res.status(404).json({ message: "User not found" });
-    
-    if(newPassword !== confirmPass){
-        return res.status(400).json({message:"Please confirm your new password"})
+
+    if (newPassword !== confirmPass) {
+      return res
+        .status(400)
+        .json({ message: "Please confirm your new password" });
     }
-    
-    if(!user?.resetPassOtpVerified){
-        return res.status(400).json({message:"Otp is not verified"})
+
+    if (!user?.resetPassOtpVerified) {
+      return res.status(400).json({ message: "Otp is not verified" });
     }
-    const hashedPassword = await bcrypt.hash(newPassword,10);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     user.resetPassOtpVerified = false;
     await user.save();
 
-    return res.status(200).json({message:"Password reset successfully"})
-
+    return res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
-    return res.status(500).json({message:`resetForgotPassword error: ${error}`})
+    return res
+      .status(500)
+      .json({ message: `resetForgotPassword error: ${error}` });
   }
 };
 
-export { signup, login, logout, forgotPasswordRequest, verifyResetPassOtp,resetForgotPassword};
+export {
+  signup,
+  login,
+  logout,
+  forgotPasswordRequest,
+  verifyResetPassOtp,
+  resetForgotPassword,
+};
